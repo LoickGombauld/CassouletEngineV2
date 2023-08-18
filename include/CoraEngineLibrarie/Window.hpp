@@ -19,6 +19,7 @@ public:
 	bool PollEvent(sf::Event& event);
 
 	void UpdateMouse();
+	sf::Vector2i GetMousePos();
 	void Close();
 	void SetFrameRate(float);
 	void SetVerticalSyncEnable(bool);
@@ -31,4 +32,5 @@ public:
 	sf::Vector2u GetSize();
 private:
 	sf::RenderWindow m_window;
+	sf::Vector2i m_mousePostition;
 };

@@ -4,7 +4,7 @@
 
 const float PI = 3.1415f;
 const unsigned int xCase = 30, yCase = 19;
-const unsigned int blockSize = 30;
+const unsigned char blockSize = 30;
 const unsigned int WIDTHSCREEN = xCase * blockSize,
 
 HEIGHTSCREEN = yCase * blockSize;
@@ -12,8 +12,8 @@ const float RENDER_DISTANCE = 1024;
 const float PlayerColliderRadius = 10;
 const unsigned int Radius = 10;
 const float SpeedMove = 200;
-const float SpeedAngle = 5;
-const float MouseDeadZone  = 200 ;
+const float SpeedAngle = 200;
+
 const float Fov = 90;
 const float RayLength = 200
 ;

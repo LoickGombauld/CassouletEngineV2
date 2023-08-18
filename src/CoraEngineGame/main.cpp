@@ -17,7 +17,6 @@ int main()
 	map.SpawnPlayerOnMap(player);
 	while (window.isOpen())
 	{
-		window.UpdateMouse();
 		sf::Event event;
 		while (window.PollEvent(event))
 		{

@@ -32,12 +32,12 @@ void Player::Draw() const
 		m_renderWindow->DrawVertex(vec);
 	m_renderWindow->DrawCircleShape(info.m_camera);*/
 	float projectionDist = 0.5f * blockSize / tan(Math::deg_to_rad(0.5f * Fov));
-
+	float floor_level = round(0.5f * HEIGHTSCREEN * (1 + tan(Math::deg_to_rad(direction.y)) / tan(Math::deg_to_rad(0.5f * Fov))));
 	short previous_column = SHRT_MIN;
 
 	sf::RectangleShape floor_shape(sf::Vector2f(1 * WIDTHSCREEN, 0.5f * HEIGHTSCREEN));
 	floor_shape.setFillColor(sf::Color(36, 54, 0));
-	floor_shape.setPosition(0, 0.5f * HEIGHTSCREEN);
+	floor_shape.setPosition(0, floor_level);
 
 	m_renderWindow->DrawRectShape(Shape(floor_shape));
 
@@ -57,18 +57,21 @@ void Player::Draw() const
 		{
 			float raydist = Math::CalculateDistance(m_vecRays[a][1].position, m_vecRays[a][0].position);
 
-			//float brightness = round(255 * std::max<float>(0, 2 * raydist / RENDER_DISTANCE - 1));
-			//std::cout << "Brightness : " << brightness << std::endl;
-			unsigned short column_Height = HEIGHTSCREEN * projectionDist / (raydist * cos(Math::deg_to_rad(rayDir)));
-			sf::RectangleShape shape(sf::Vector2f(std::max(1, next_column - current_Column), column_Height));
-			shape.setFillColor(sf::Color(146, 146, 170));
-			shape.setPosition(current_Column, round(0.5f * (HEIGHTSCREEN - column_Height)));
+			unsigned short column_height = static_cast<unsigned short>(HEIGHTSCREEN * projectionDist / (raydist * cos(Math::deg_to_rad(rayDir))));
+			unsigned char brightness = static_cast<unsigned char>(round(255 * std::max<float>(0, 2 * raydist / RENDER_DISTANCE - 1)));
+
+			sf::RectangleShape shape(sf::Vector2f(std::max(1, next_column - current_Column), column_height));
+			shape.setFillColor(sf::Color(73, 255, 255, brightness));
+			shape.setPosition(current_Column, round(0.5f * (HEIGHTSCREEN - column_height)));
+			sf::RectangleShape wall(sf::Vector2f(std::max(1, next_column - current_Column), column_height));
+
+			wall.setFillColor(sf::Color(146, 146, 170));
+			wall.setPosition(current_Column, round(floor_level - 0.5f * column_height));
 
 			previous_column = current_Column;
 
+			m_renderWindow->DrawRectShape(Shape(wall));
 			m_renderWindow->DrawRectShape(Shape(shape));
-			shape.setFillColor(sf::Color(73, 255, 255));
-			shape.setPosition(current_Column, round(0.5f * (HEIGHTSCREEN - column_Height)));
 		}
 	}
 }
@@ -109,13 +112,12 @@ void Player::UpdateKeyboardHit(sf::Time dt) {
 
 	//Mouse control!
 	//By the way, do I need to write comments? Can't you just watch my video? I've already explained everything there.
-	float mouseDist = Math::CalculateDistance(sf::Vector2f(window_center_x, window_center_y), sf::Mouse::getPosition(*m_renderWindow->GetHandle()));
-	std::cout << " MouseDit: " << mouseDist << std::endl;
-	if (mouseDist > MouseDeadZone)
-	{
-		info.m_angle += Fov * (window_center_x - sf::Mouse::getPosition(*m_renderWindow->GetHandle()).x) / m_renderWindow->GetSize().x * info.m_speedAngle * dt.asSeconds();
-	}
-	//rotation_vertical = Fov * (window_center_y - sf::Mouse::getPosition(*m_renderWindow->GetHandle()).y) / m_renderWindow->GetSize().y;
+	float rotation_horizontal = Fov * (window_center_x - sf::Mouse::getPosition(*m_renderWindow->GetHandle()).x) / m_renderWindow->GetSize().x * info.m_speedAngle  *dt.asSeconds();
+
+	info.m_angle = Math::get_degrees(info.m_angle + rotation_horizontal);
+
+	sf::Mouse::setPosition(sf::Vector2i(window_center_x, window_center_y), *m_renderWindow->GetHandle());
+
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
@@ -129,18 +131,15 @@ void Player::UpdateKeyboardHit(sf::Time dt) {
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
-		info.m_position.x = dCos(info.m_angle) * info.m_speedMove * dt.asSeconds();
-		info.m_position.y += dSin(info.m_angle) * info.m_speedMove * dt.asSeconds();
+		info.m_position.x += dCos(info.m_angle - 90) * info.m_speedMove * dt.asSeconds();
+		info.m_position.y += dSin(info.m_angle - 90) * info.m_speedMove * dt.asSeconds();
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
-		info.m_angle += info.m_speedAngle * dt.asSeconds();
+		info.m_position.x += dCos(info.m_angle + 90) * info.m_speedMove * dt.asSeconds();
+		info.m_position.y += dSin(info.m_angle + 90) * info.m_speedMove * dt.asSeconds();
 	}
 
-	if (info.m_angle > 180)
-		info.m_angle = -180;
-	if (info.m_angle < -180)
-		info.m_angle = 180;
 
 	for (int y = 0; y < yCase; y++)
 	{
@@ -156,6 +155,7 @@ void Player::UpdateKeyboardHit(sf::Time dt) {
 		}
 	}
 
+	std::cout << "Angle : " << info.m_angle << std::endl;
 	info.m_camera.SetRotation(info.m_angle);
 	info.m_camera.SetPostion(info.m_position);
 
@@ -169,8 +169,9 @@ bool Player::Intersect(unsigned int it) {
 
 	for (unsigned int l = 0; l < info.m_rayLength; l++)
 	{
-		int dx = (int)(info.m_position.x + l * direction.x);
-		int dy = (int)(info.m_position.y + l * direction.y);
+		int dx = static_cast<int>(info.m_position.x + l * direction.x);
+		int dy = static_cast<int>(info.m_position.y + l * direction.y);
+
 		if (m_map.CheckMapCase(dy / blockSize, dx / blockSize))
 		{
 			info.m_intersection.x = dx;

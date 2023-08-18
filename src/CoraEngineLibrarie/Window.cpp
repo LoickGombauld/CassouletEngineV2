@@ -31,12 +31,12 @@ bool Window::PollEvent(sf::Event& event)
 
 void Window::UpdateMouse()
 {
-	if (sf::Mouse::getPosition().x > m_window.getSize().x * m_window.getPosition().x  
-		|| sf::Mouse::getPosition().y > m_window.getSize().y * m_window.getPosition().y)
-	{
-		sf::Mouse::setPosition({ WIDTHSCREEN / 2 ,HEIGHTSCREEN / 2 });
-	}
-	
+	m_mousePostition = sf::Mouse::getPosition();
+}
+
+sf::Vector2i Window::GetMousePos()
+{
+	return  m_mousePostition;
 }
 
 void Window::Close()

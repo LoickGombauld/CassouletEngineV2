@@ -40,8 +40,10 @@ public:
 	inline float toRadian(float degree) { return (PI / 180) * degree; }
 	inline float dCos(float degree) { return cos(toRadian( degree)); }
 	inline float dSin(float degree) { return sin(toRadian( degree)); }
+	inline float dTan(float degree) { return tan(toRadian( degree)); }
 
 private:
 	sf::Vector2f previous;
 	sf::Vector2f direction;
+	sf::Vector2i currentMousePos;
 };
