@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="debug|x64">
+      <Configuration>debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release|x64">
+      <Configuration>release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{B76802FC-0966-4621-BE1A-BAA943C35D16}</ProjectGuid>
+    <RootNamespace>CoraEngineGame</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+    <OutDir>..\..\bin\windows_x64_debug\</OutDir>
+    <IntDir>..\..\build\.objs\CoraEngineGame\windows\x64\debug\</IntDir>
+    <TargetName>CoraEngineGame</TargetName>
+    <TargetExt>.exe</TargetExt>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+    <OutDir>..\..\bin\windows_x64_release\</OutDir>
+    <IntDir>..\..\build\.objs\CoraEngineGame\windows\x64\release\</IntDir>
+    <TargetName>CoraEngineGame</TargetName>
+    <TargetExt>.exe</TargetExt>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Debugger">
+    <LocalDebuggerWorkingDirectory>..\..\bin</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerEnvironment>PATH=..\..\bin\windows_x64_debug;C:\Users\wild1\AppData\Local\.xmake\packages\s\sfml\2.5.1\e3f1dd9ec1724070a224c808a7d5c4eb\lib;C:\Users\wild1\AppData\Local\.xmake\packages\l\libflac\1.4.3\28dd374d205f46c2a04ea9e084b29ba3\lib;C:\Users\wild1\AppData\Local\.xmake\packages\l\libvorbis\1.3.7\b70bda53adc447cbbbe8489b20a876db\lib;C:\Users\wild1\AppData\Local\.xmake\packages\l\libogg\v1.3.4\2022c3ffa18349dc870e0552ed20b90d\lib;C:\Users\wild1\AppData\Local\.xmake\packages\o\openal-soft\1.23.1\d84c446cae4a48619cbde66a3c73f8b9\lib;C:\Users\wild1\AppData\Local\.xmake\packages\s\sfml\2.5.1\e3f1dd9ec1724070a224c808a7d5c4eb\bin;C:\Users\wild1\AppData\Local\.xmake\packages\c\cmake\3.26.4\4d23fc87455a4a1c819e093bd8456f0f\bin;C:\Users\wild1\AppData\Local\.xmake\packages\l\libogg\v1.3.4\2022c3ffa18349dc870e0552ed20b90d\bin;C:\Users\wild1\AppData\Local\.xmake\packages\l\libflac\1.4.3\28dd374d205f46c2a04ea9e084b29ba3\bin;C:\Users\wild1\AppData\Local\.xmake\packages\l\libvorbis\1.3.7\b70bda53adc447cbbbe8489b20a876db\bin;C:\Users\wild1\AppData\Local\.xmake\packages\o\openal-soft\1.23.1\d84c446cae4a48619cbde66a3c73f8b9\bin;$([System.Environment]::GetEnvironmentVariable('PATH'));%(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Debugger">
+    <LocalDebuggerWorkingDirectory>..\..\bin</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerEnvironment>PATH=..\..\bin\windows_x64_release;C:\Users\wild1\AppData\Local\.xmake\packages\s\sfml\2.5.1\e3f1dd9ec1724070a224c808a7d5c4eb\lib;C:\Users\wild1\AppData\Local\.xmake\packages\l\libflac\1.4.3\28dd374d205f46c2a04ea9e084b29ba3\lib;C:\Users\wild1\AppData\Local\.xmake\packages\l\libvorbis\1.3.7\b70bda53adc447cbbbe8489b20a876db\lib;C:\Users\wild1\AppData\Local\.xmake\packages\l\libogg\v1.3.4\2022c3ffa18349dc870e0552ed20b90d\lib;C:\Users\wild1\AppData\Local\.xmake\packages\o\openal-soft\1.23.1\d84c446cae4a48619cbde66a3c73f8b9\lib;C:\Users\wild1\AppData\Local\.xmake\packages\s\sfml\2.5.1\e3f1dd9ec1724070a224c808a7d5c4eb\bin;C:\Users\wild1\AppData\Local\.xmake\packages\c\cmake\3.26.4\4d23fc87455a4a1c819e093bd8456f0f\bin;C:\Users\wild1\AppData\Local\.xmake\packages\l\libogg\v1.3.4\2022c3ffa18349dc870e0552ed20b90d\bin;C:\Users\wild1\AppData\Local\.xmake\packages\l\libflac\1.4.3\28dd374d205f46c2a04ea9e084b29ba3\bin;C:\Users\wild1\AppData\Local\.xmake\packages\l\libvorbis\1.3.7\b70bda53adc447cbbbe8489b20a876db\bin;C:\Users\wild1\AppData\Local\.xmake\packages\o\openal-soft\1.23.1\d84c446cae4a48619cbde66a3c73f8b9\bin;$([System.Environment]::GetEnvironmentVariable('PATH'));%(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+    <Link>
+      <AdditionalLibraryDirectories>..\..\bin\windows_x64_debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>CoraEngineLibrarie.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-dynamicbase -nxcompat %(AdditionalOptions)</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <WarningLevel>Level4</WarningLevel>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <ExternalTemplatesDiagnostics>false</ExternalTemplatesDiagnostics>
+      <DisableSpecificWarnings>4251;4275;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PreprocessorDefinitions>__config_debug__;__config_x64__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <MinimalRebuild>false</MinimalRebuild>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>..\..\include</AdditionalIncludeDirectories>
+      <AdditionalOptions>-FS /EHsc %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>__config_debug__;__config_x64__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\include</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+    <Link>
+      <AdditionalLibraryDirectories>..\..\bin\windows_x64_release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>CoraEngineLibrarie.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-dynamicbase -nxcompat /opt:ref /opt:icf %(AdditionalOptions)</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <WarningLevel>Level4</WarningLevel>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <ExternalTemplatesDiagnostics>false</ExternalTemplatesDiagnostics>
+      <DisableSpecificWarnings>4251;4275;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PreprocessorDefinitions>NDEBUG;__config_release__;__config_x64__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <MinimalRebuild>false</MinimalRebuild>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>..\..\include</AdditionalIncludeDirectories>
+      <AdditionalOptions>/EHsc %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;__config_release__;__config_x64__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\include</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\CoraEngineGame\main.cpp">
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
