@@ -1,9 +1,47 @@
 #include <CoraEngineLibrarie/Map.hpp>
 #include  <CoraEngineLibrarie/Player.hpp>
 
+
+
 Map::Map(Window& window) : m_renderWindow(window)
 {
+	GenerateMap();
+}
 
+Map::Map(Window& window, TextureManager wallTextures, TextureManager floorTextures) : m_renderWindow(window),
+m_wallTexures(wallTextures), m_floorTexures(floorTextures)
+{
+	GenerateMap();
+}
+
+Map::Map(Window& window, TextureManager textures, TextureType textureType) : m_renderWindow(window)
+{
+	switch (textureType) {
+	case WallTexture:
+		m_wallTexures = textures;
+		break;
+	case FloorTexture:
+		m_floorTexures = textures;
+		break;
+	default:;
+	}
+	GenerateMap();
+}
+
+TextureManager Map::GetTextureManager(TextureType Texuretype)
+{
+	switch (Texuretype) {
+	case WallTexture:
+		return m_wallTexures;
+	case FloorTexture:
+		return m_floorTexures;
+	default:;
+
+	}
+}
+
+void Map::GenerateMap()
+{
 	sf::Image map_sketch;
 
 	while (map_sketch.getPixelsPtr() == nullptr)
@@ -24,6 +62,10 @@ Map::Map(Window& window) : m_renderWindow(window)
 			if (pixel == sf::Color(255, 255, 255))
 			{
 				sf::RectangleShape box(sf::Vector2f(blockSize, blockSize));
+				if (HasTexures(WallTexture))
+				{
+					SetRandomShapeTexture(box, m_wallTexures);
+				}
 				box.setPosition(cellPosition);
 				m_map[a][b] = Cell(cellPosition, CellType::Wall, box);
 				std::cout << "Wall Placed" << std::endl;
@@ -35,6 +77,10 @@ Map::Map(Window& window) : m_renderWindow(window)
 			else
 			{
 				sf::RectangleShape box(sf::Vector2f(blockSize, blockSize));
+				if (HasTexures(FloorTexture))
+				{
+					SetRandomShapeTexture(box, m_floorTexures);
+				}
 				box.setFillColor(sf::Color::Blue);
 				box.setPosition(cellPosition);
 				m_map[a][b] = Cell(cellPosition, CellType::Empty, box);
@@ -43,6 +89,31 @@ Map::Map(Window& window) : m_renderWindow(window)
 		}
 
 		m_image = map_sketch;
+	}
+}
+
+void Map::SetRandomShapeTexture(sf::Shape& box, TextureManager& textures)
+{
+	box.setTexture(textures.GetRandomTexture());
+	box.setTextureRect(sf::IntRect({ 0,0 }, { 16 ,16 }));
+}
+
+bool Map::HasTexures(TextureType type)
+{
+	switch (type) {
+	case WallTexture:
+		if (m_wallTexures.TextureCount() == 0)
+		{
+			return false;
+		}
+		return  true;
+	case FloorTexture:
+		if (m_floorTexures.TextureCount() == 0)
+		{
+			return false;
+		}
+		return  true;
+	default:;
 	}
 }
 
@@ -87,6 +158,7 @@ CellType Map::GetCellType(int x, int y)
 	CheckXY(x, y);
 	return m_map[y][x].GetCellType();
 }
+
 
 void Map::CheckXY(int& x, int& y)
 {

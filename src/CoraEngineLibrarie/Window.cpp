@@ -28,17 +28,6 @@ bool Window::PollEvent(sf::Event& event)
 	return m_window.pollEvent(event);
 }
 
-
-void Window::UpdateMouse()
-{
-	m_mousePostition = sf::Mouse::getPosition();
-}
-
-sf::Vector2i Window::GetMousePos()
-{
-	return  m_mousePostition;
-}
-
 void Window::Close()
 {
 	m_window.close();

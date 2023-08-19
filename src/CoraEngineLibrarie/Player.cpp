@@ -1,7 +1,6 @@
 #include <iostream>
 #include <CoraEngineLibrarie/Player.hpp>
 
-
 Player::Player(Window& window, Map& map) : m_renderWindow(&window), m_map(map)
 {
 	info.m_radius = Radius;
@@ -31,11 +30,15 @@ void Player::Draw() const
 	/*for (auto& vec : m_vecRays)
 		m_renderWindow->DrawVertex(vec);
 	m_renderWindow->DrawCircleShape(info.m_camera);*/
-	float projectionDist = 0.5f * blockSize / tan(Math::deg_to_rad(0.5f * Fov));
-	float floor_level = round(0.5f * HEIGHTSCREEN * (1 + tan(Math::deg_to_rad(direction.y)) / tan(Math::deg_to_rad(0.5f * Fov))));
+	float projectionDist = 0.5f * blockSize / tan(Math::deg_to_rad(0.5f *  Fov));
+	float floor_level = round(0.5f * HEIGHTSCREEN * (1 + tan(Math::deg_to_rad(info.m_angleY)) / tan(Math::deg_to_rad(0.5f * Fov))));
 	short previous_column = SHRT_MIN;
 
-	sf::RectangleShape floor_shape(sf::Vector2f(1 * WIDTHSCREEN, 0.5f * HEIGHTSCREEN));
+	sf::RectangleShape floor_shape(sf::Vector2f( WIDTHSCREEN, HEIGHTSCREEN - floor_level));
+	if (m_map.HasTexture())
+	{
+		
+	}
 	floor_shape.setFillColor(sf::Color(36, 54, 0));
 	floor_shape.setPosition(0, floor_level);
 
@@ -96,48 +99,67 @@ void Player::Projection()
 			m_vecRays[i][1].position = info.m_intersection;
 		}
 		else {
-			m_vecRays[i][1].position = { info.m_position.x + info.m_rayLength * dCos((info.m_angle + Fov / 2) - i * (Fov / WIDTHSCREEN))
-			,info.m_position.y + info.m_rayLength * dSin((info.m_angle + Fov / 2) - i * (Fov / WIDTHSCREEN)) };
+			m_vecRays[i][1].position = { info.m_position.x + info.m_rayLength * dCos((info.m_angleX + Fov / 2) - i * (Fov / WIDTHSCREEN))
+			,info.m_position.y + info.m_rayLength * dSin((info.m_angleX + Fov / 2) - i * (Fov / WIDTHSCREEN)) };
 		}
 	}
 }
 
-
+void Player::SetMouse(bool isUnlocked)
+{
+	mouseIslocked = isUnlocked;
+	m_renderWindow->SetMouseCursorVisible(!isUnlocked);
+}
 
 void Player::UpdateKeyboardHit(sf::Time dt) {
 
 	previous = info.m_position;
+
+	if (mouseIslocked)
+	{
 	unsigned short window_center_x = static_cast<unsigned short>(round(0.5f * m_renderWindow->GetSize().x));
 	unsigned short window_center_y = static_cast<unsigned short>(round(0.5f * m_renderWindow->GetSize().y));
+		
+	float rotation_horizontal = Fov * (window_center_x - sf::Mouse::getPosition(*m_renderWindow->GetHandle()).x) / m_renderWindow->GetSize().x * info.m_speedAngle  *dt.asSeconds();
+	float rotation_vertical = Fov * (window_center_y - sf::Mouse::getPosition(*m_renderWindow->GetHandle()).y) / m_renderWindow->GetSize().y * info.m_speedAngle  *dt.asSeconds();
+
+	info.m_angleX = Math::get_degrees(info.m_angleX + rotation_horizontal);
+	info.m_angleY = std::clamp<float>(info.m_angleY + rotation_vertical, -89, 89);
+	  
+	sf::Mouse::setPosition(sf::Vector2i(window_center_x, window_center_y), *m_renderWindow->GetHandle());
+	}
 
 	//Mouse control!
 	//By the way, do I need to write comments? Can't you just watch my video? I've already explained everything there.
-	float rotation_horizontal = Fov * (window_center_x - sf::Mouse::getPosition(*m_renderWindow->GetHandle()).x) / m_renderWindow->GetSize().x * info.m_speedAngle  *dt.asSeconds();
 
-	info.m_angle = Math::get_degrees(info.m_angle + rotation_horizontal);
-
-	sf::Mouse::setPosition(sf::Vector2i(window_center_x, window_center_y), *m_renderWindow->GetHandle());
-
-
+	bool updownIspressed = false;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
-		info.m_position.x += dCos(info.m_angle) * info.m_speedMove * dt.asSeconds();
-		info.m_position.y += dSin(info.m_angle) * info.m_speedMove * dt.asSeconds();
+		info.m_position.x += dCos(info.m_angleX) * info.m_speedMove * dt.asSeconds();
+		info.m_position.y += dSin(info.m_angleX) * info.m_speedMove * dt.asSeconds();
+		updownIspressed = true;
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 	{
-		info.m_position.x -= dCos(info.m_angle) * info.m_speedMove * dt.asSeconds();
-		info.m_position.y -= dSin(info.m_angle) * info.m_speedMove * dt.asSeconds();
+		info.m_position.x -= dCos(info.m_angleX) * info.m_speedMove * dt.asSeconds();
+		info.m_position.y -= dSin(info.m_angleX) * info.m_speedMove * dt.asSeconds();
+		updownIspressed = true;
 	}
+	int localspeedMove = info.m_speedMove;
+	if (updownIspressed)
+	{
+		localspeedMove /= 2;
+	}
+
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
-		info.m_position.x += dCos(info.m_angle - 90) * info.m_speedMove * dt.asSeconds();
-		info.m_position.y += dSin(info.m_angle - 90) * info.m_speedMove * dt.asSeconds();
+		info.m_position.x += dCos(info.m_angleX - 90) * localspeedMove * dt.asSeconds();
+		info.m_position.y += dSin(info.m_angleX - 90) * localspeedMove * dt.asSeconds();
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
-		info.m_position.x += dCos(info.m_angle + 90) * info.m_speedMove * dt.asSeconds();
-		info.m_position.y += dSin(info.m_angle + 90) * info.m_speedMove * dt.asSeconds();
+		info.m_position.x += dCos(info.m_angleX + 90) * localspeedMove * dt.asSeconds();
+		info.m_position.y += dSin(info.m_angleX + 90) * localspeedMove * dt.asSeconds();
 	}
 
 
@@ -146,25 +168,27 @@ void Player::UpdateKeyboardHit(sf::Time dt) {
 		for (int x = 0; x < xCase; x++)
 		{
 
-			if (m_map.GetCellType(x, y) == CellType::Wall &&
-				Math::CalculateDistance(m_map.GetCell(x, y).GetCellPosition(), info.m_position) < info.m_colliderRadius ||
-				m_map.ContainPoint(x, y, info.m_position) && m_map.GetCellType(x, y) == ::Wall)
+			if (m_map.GetCellType(x, y) == CellType::Wall && m_map.ContainPoint(x, y, info.m_position))
 			{
 				info.m_position = previous;
+				// m_map.GetCell(x, y).UpdateCellColision(info.m_position);
 			}
 		}
 	}
 
-	std::cout << "Angle : " << info.m_angle << std::endl;
-	info.m_camera.SetRotation(info.m_angle);
+	info.m_camera.SetRotation(info.m_angleX);
 	info.m_camera.SetPostion(info.m_position);
+	std::cout << "Position : " << info.m_position.x <<" " << info.m_position.y << std::endl;
 
 }
 
-
+//void Player::Draw_Map()
+//{
+//	
+//}
 
 bool Player::Intersect(unsigned int it) {
-	float fAngle = (info.m_angle + Fov / 2 - it * (Fov / WIDTHSCREEN));
+	float fAngle = (info.m_angleX + Fov / 2 - it * (Fov / WIDTHSCREEN));
 	sf::Vector2f direction = { dCos(fAngle), dSin(fAngle) };
 
 	for (unsigned int l = 0; l < info.m_rayLength; l++)

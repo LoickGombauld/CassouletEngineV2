@@ -17,9 +17,6 @@ public:
 	void SetTitle(std::string title);
 	bool isOpen() const;
 	bool PollEvent(sf::Event& event);
-
-	void UpdateMouse();
-	sf::Vector2i GetMousePos();
 	void Close();
 	void SetFrameRate(float);
 	void SetVerticalSyncEnable(bool);

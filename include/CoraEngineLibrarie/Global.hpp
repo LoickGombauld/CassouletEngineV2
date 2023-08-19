@@ -9,9 +9,9 @@ const unsigned int WIDTHSCREEN = xCase * blockSize,
 
 HEIGHTSCREEN = yCase * blockSize;
 const float RENDER_DISTANCE = 1024;
-const float PlayerColliderRadius = 10;
+const float PlayerColliderRadius = 1;
 const unsigned int Radius = 10;
-const float SpeedMove = 200;
+const float SpeedMove = 100;
 const float SpeedAngle = 200;
 
 const float Fov = 90;
@@ -43,6 +43,18 @@ public:
 	void SetCellType(CellType cell)
 	{
 		m_CellType = cell;
+	}
+
+	void UpdateCellColision(sf::Vector2f& entityPosition)
+	{
+		if (entityPosition.x < m_shape.getGlobalBounds().left)
+		{
+			entityPosition.x = m_shape.getGlobalBounds().left;
+		}
+		if (entityPosition.x < m_shape.getGlobalBounds().top)
+		{
+			entityPosition.y = m_shape.getGlobalBounds().top;
+		}
 	}
 
 	sf::Vector2f GetCellPosition() const

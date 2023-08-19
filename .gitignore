@@ -76,3 +76,7 @@ vsxmake2019/.vs/CoraEngine/v16/ipch/AutoPCH/a700ceb7edc8c657/MAP.ipch
 vsxmake2019/.vs/CoraEngine/v16/ipch/AutoPCH/e1d88600d246741/CAMERA.ipch
 vsxmake2019/.vs/CoraEngine/v16/ipch/AutoPCH/e638f2b7d500a034/MAIN.ipch
 vsxmake2019/.vs/CoraEngine/v16/ipch/AutoPCH/f34b9f29883f4164/PLAYER.ipch
+*.db-shm
+*.db-wal
+*.opendb
+*.ipch

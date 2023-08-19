@@ -13,7 +13,7 @@ public:
 	Shape m_camera;
 	sf::Vector2f m_position, m_intersection;
 
-	float m_angle, m_rayLength;
+	float m_angleX, m_angleY, m_rayLength;
 	float m_radius;
 	float m_speedMove, m_speedAngle;
 	float m_colliderRadius;
@@ -36,6 +36,7 @@ public:
 	bool Intersect(unsigned int it);
 	void SetPosition(sf::Vector2f);
 	void SetPosition(float,float);
+	void Player::SetMouse(bool isUnlocked);
 	sf::Vector2f GetPosition() const;
 	inline float toRadian(float degree) { return (PI / 180) * degree; }
 	inline float dCos(float degree) { return cos(toRadian( degree)); }
@@ -44,6 +45,5 @@ public:
 
 private:
 	sf::Vector2f previous;
-	sf::Vector2f direction;
-	sf::Vector2i currentMousePos;
+	bool mouseIslocked;
 };
