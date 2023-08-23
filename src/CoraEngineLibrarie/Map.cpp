@@ -3,53 +3,38 @@
 
 
 
-Map::Map(Window& window) : m_renderWindow(window)
+Map::Map()
 {
 	GenerateMap();
 }
 
-Map::Map(Window& window, TextureManager wallTextures, TextureManager floorTextures) : m_renderWindow(window),
-m_wallTexures(wallTextures), m_floorTexures(floorTextures)
+Cell Map::GetCell(int y, int x)
 {
-	GenerateMap();
+	return m_map[y][x];
 }
 
-Map::Map(Window& window, TextureManager textures, TextureType textureType) : m_renderWindow(window)
+
+
+std::array<std::array<Cell, yCase>, xCase> Map::GetHandle()
 {
-	switch (textureType) {
-	case WallTexture:
-		m_wallTexures = textures;
-		break;
-	case FloorTexture:
-		m_floorTexures = textures;
-		break;
-	default:;
-	}
-	GenerateMap();
+	return m_map;
 }
-
-TextureManager Map::GetTextureManager(TextureType Texuretype)
+CellType Map::GetCellType(int x, int y)
 {
-	switch (Texuretype) {
-	case WallTexture:
-		return m_wallTexures;
-	case FloorTexture:
-		return m_floorTexures;
-	default:;
-
-	}
+	return m_map[y][x].GetCellType();
 }
 
 void Map::GenerateMap()
 {
 	sf::Image map_sketch;
-
-	while (map_sketch.getPixelsPtr() == nullptr)
+	bool mapisinvalid = true;
+	while (mapisinvalid)
 	{
 		std::string levelName; std::cout << "Level Name ? : ";
 		std::cin >> levelName;
 		std::cout << std::endl;
 		map_sketch.loadFromFile("Resources/Level/" + levelName + ".png");
+		mapisinvalid = map_sketch.getPixelsPtr() == nullptr;
 	}
 
 	for (unsigned char a = 0; a < xCase; a++)
@@ -62,28 +47,14 @@ void Map::GenerateMap()
 			if (pixel == sf::Color(255, 255, 255))
 			{
 				sf::RectangleShape box(sf::Vector2f(blockSize, blockSize));
-				if (HasTexures(WallTexture))
-				{
-					SetRandomShapeTexture(box, m_wallTexures);
-				}
 				box.setPosition(cellPosition);
-				m_map[a][b] = Cell(cellPosition, CellType::Wall, box);
 				std::cout << "Wall Placed" << std::endl;
+				m_map[a][b] = Cell(cellPosition, Wall, box);
+				m_walls.push_back(m_map[a][b]);
 			}
-			//else if (pixel == sf::Color(0, 0, 255))
-			//{
-			//	i_steven.set_position(static_cast<float>(CELL_SIZE * a), static_cast<float>(CELL_SIZE * b));
-			//}
 			else
 			{
-				sf::RectangleShape box(sf::Vector2f(blockSize, blockSize));
-				if (HasTexures(FloorTexture))
-				{
-					SetRandomShapeTexture(box, m_floorTexures);
-				}
-				box.setFillColor(sf::Color::Blue);
-				box.setPosition(cellPosition);
-				m_map[a][b] = Cell(cellPosition, CellType::Empty, box);
+				m_map[a][b] = Empty;
 			}
 
 		}
@@ -92,31 +63,22 @@ void Map::GenerateMap()
 	}
 }
 
-void Map::SetRandomShapeTexture(sf::Shape& box, TextureManager& textures)
+void Map::SetWallTexture(int index, sf::Texture* walltexture)
 {
-	box.setTexture(textures.GetRandomTexture());
-	box.setTextureRect(sf::IntRect({ 0,0 }, { 16 ,16 }));
+	m_walls[index].GetShape().setTexture(walltexture);
 }
 
-bool Map::HasTexures(TextureType type)
+void Map::Draw(Window& renderWindow)
 {
-	switch (type) {
-	case WallTexture:
-		if (m_wallTexures.TextureCount() == 0)
+	for (unsigned char a = 0; a < xCase; a++)
+	{
+		for (unsigned char b = 0; b < yCase; b++)
 		{
-			return false;
+			Shape box(m_map[a][b].GetShape());
+			renderWindow.DrawRectShape(box);
 		}
-		return  true;
-	case FloorTexture:
-		if (m_floorTexures.TextureCount() == 0)
-		{
-			return false;
-		}
-		return  true;
-	default:;
 	}
 }
-
 
 void Map::SpawnPlayerOnMap(Player& player)
 {
@@ -141,54 +103,4 @@ void Map::SpawnPlayerOnMap(Player& player)
 	}
 }
 
-void Map::Draw()
-{
-	for (unsigned char a = 0; a < xCase; a++)
-	{
-		for (unsigned char b = 0; b < yCase; b++)
-		{
-			Shape box(m_map[a][b].GetShape());
-			m_renderWindow.DrawRectShape(box);
-		}
-	}
-}
 
-CellType Map::GetCellType(int x, int y)
-{
-	CheckXY(x, y);
-	return m_map[y][x].GetCellType();
-}
-
-
-void Map::CheckXY(int& x, int& y)
-{
-	while (x > xCase || y > yCase)
-	{
-		if (x > xCase)
-		{
-			x /= blockSize;
-		}
-		if (y > yCase)
-		{
-			y /= blockSize;
-		}
-	}
-}
-
-Cell Map::GetCell(int x, int y)
-{
-	CheckXY(x, y);
-	return m_map[y][x];
-}
-
-bool Map::ContainPoint(int x, int y, sf::Vector2f point)
-{
-	CheckXY(x, y);
-	return  m_map[y][x].CellBounds().contains(point);
-}
-
-
-bool Map::CheckMapCase(unsigned int dx, unsigned int dy)
-{
-	return  m_map[dy][dx].GetCellType() == CellType::Wall;
-}

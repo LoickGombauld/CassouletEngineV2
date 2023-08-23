@@ -20,8 +20,9 @@ public:
 	void SetRotation(float angle);
 	sf::CircleShape GethandleCircle();
 	sf::RectangleShape GethandleRect();
-	sf::FloatRect GetGlobalRectBounds();
-	sf::FloatRect GetGlobalCicleBound();
+	sf::FloatRect GetGlobalRectBounds()const;
+	sf::FloatRect GetGlobalCircleBound()const;
+	sf::Vector2f GetRectSize()const;
 private:
 	sf::CircleShape m_cshape;
 	sf::RectangleShape m_rshape;

@@ -58,15 +58,18 @@ xmake version 2.8.1+dev.732d60063
     <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Shape.hpp">
       <Filter>include\CoraEngineLibrarie</Filter>
     </ClInclude>
-    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Window.hpp">
+    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\TextureManager.hpp">
       <Filter>include\CoraEngineLibrarie</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\CoraEngineLibrarie\TextureManager.hpp">
+    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Window.hpp">
       <Filter>include\CoraEngineLibrarie</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\Map.cpp">
+      <Filter>src\CoraEngineLibrarie</Filter>
+    </ClCompile>
+    <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\MapCollision.cpp">
       <Filter>src\CoraEngineLibrarie</Filter>
     </ClCompile>
     <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\Player.cpp">
@@ -78,10 +81,10 @@ xmake version 2.8.1+dev.732d60063
     <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\Shape.cpp">
       <Filter>src\CoraEngineLibrarie</Filter>
     </ClCompile>
-    <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\Window.cpp">
+    <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\TextureManager.cpp">
       <Filter>src\CoraEngineLibrarie</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\CoraEngineLibrarie\TextureManager.cpp">
+    <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\Window.cpp">
       <Filter>src\CoraEngineLibrarie</Filter>
     </ClCompile>
   </ItemGroup>

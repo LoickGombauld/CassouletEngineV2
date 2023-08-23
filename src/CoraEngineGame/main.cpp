@@ -7,18 +7,31 @@
 
 int main()
 {
-	std::printf("Welcome to Fantasy Zone Get Ready !");
+	std::cout << "Welcome to Fantasy Zone Get Ready !" << std::endl;
+	Window mapWindow(HEIGHTSCREEN, HEIGHTSCREEN, "Map");
+	mapWindow.GetHandle()->setPosition({ mapWindow.GetHandle()->getPosition() / 6 });
+	mapWindow.SetFrameRate(144);
+	mapWindow.SetVerticalSyncEnable(true);
 	Window window(WIDTHSCREEN, HEIGHTSCREEN, "Cora Engine (Ou Cassoulet Engine 2 why not)");
 	window.SetFrameRate(144);
 	window.SetVerticalSyncEnable(true);
 	window.SetMouseCursorVisible(false);
+
+
+	TextureManager FloorManager("Resources/Floor");
 	TextureManager WallManager("Resources/Wall");
-	Map map(window);
-	Player player(window, map);
+	Map map;
+	Player player(window ,WallManager,FloorManager,map);
+
 	map.SpawnPlayerOnMap(player);
-	sf::IntRect WindowRect(window.GetHandle()->getPosition(), static_cast<sf::Vector2i>(window.GetSize()));
+	//for (int i = 0 ; i < map.m_walls.size() ; i++ )
+	//{
+	//	map.SetWallTexture(i, WallManager.GetTexture(0));
+	//}
+
 	while (window.isOpen())
 	{
+		sf::IntRect WindowRect(window.GetHandle()->getPosition(), static_cast<sf::Vector2i>(window.GetSize()));
 		sf::Event event;
 		while (window.PollEvent(event))
 		{
@@ -29,19 +42,44 @@ int main()
 		{
 			player.SetMouse(false);
 		}
-		if (WindowRect.contains(sf::Mouse::getPosition()) & sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		if (WindowRect.contains(sf::Mouse::getPosition()) & sf::Mouse::isButtonPressed(sf::Mouse::Right))
 		{
 			player.SetMouse(true);
 		}
 
+		//for (unsigned short a = 0; a < ceil(blockSize * xCase / static_cast<float>(blockSize)); a++)
+		//{
+		//	for (unsigned short b = 0; b < ceil(blockSize * yCase / static_cast<float>(blockSize)); b++)
+		//	{
+		//		map_grid_cell_sprite.setPosition(static_cast<float>(blockSize * a), static_cast<float>(blockSize * b));
+
+		//		window.GetHandle()->draw(map_grid_cell_sprite);
+		//	}
+		//}
+
+		//for (unsigned short a = 0; a < xCase; a++)
+		//{
+		//	for (unsigned short b = 0; b < yCase; b++)
+		//	{
+		//		if (map.GetCell(a,b) == Wall)
+		//		{
+		//			map_wall_sprite.setPosition(static_cast<float>(blockSize * a), static_cast<float>(blockSize * b));
+
+		//			window.GetHandle()->draw(map_wall_sprite);
+		//		}
+		//	}
+		//}
+
 		player.Update();
 		window.Clear(sf::Color::Cyan);
+		mapWindow.Clear();
 
-		player.Draw();
+		player.Draw(mapWindow);
+		map.Draw(mapWindow);
 
-		map.Draw();
 
 		window.Display();
+		mapWindow.Display();
 	}
 	return 0;
 };

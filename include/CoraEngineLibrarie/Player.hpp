@@ -5,8 +5,7 @@
 #include <CoraEngineLibrarie/Window.hpp>
 #include <CoraEngineLibrarie/Shape.hpp>
 #include  <CoraEngineLibrarie/Map.hpp>
-#include  <CoraEngineLibrarie/Global.hpp>
-#include <CoraEngineLibrarie/Math.hpp>
+#include <CoraEngineLibrarie/TextureManager.hpp>
 
 struct CASSOULET_DLL CameraInfo {
 public:
@@ -17,6 +16,7 @@ public:
 	float m_radius;
 	float m_speedMove, m_speedAngle;
 	float m_colliderRadius;
+	std::array<float, WIDTHSCREEN> view_rays;
 	sf::Clock m_clock;
 };
 class CASSOULET_DLL Player
@@ -25,17 +25,22 @@ protected:
 	Window* m_renderWindow;
 	CameraInfo info;
 	std::vector<sf::VertexArray>m_vecRays;
-	Map m_map;
 
 public:
-	Player(Window& window, Map& map);
-	void Draw() const;
+	Player(Window& window, TextureManager& texture_manager, TextureType type, Map& map);
+	Player(Window& window, TextureManager& WallTextures,TextureManager& FloorTextures, Map& map);
+	void Draw(Window&);
 	void Update();
 	void Projection();
-	void UpdateKeyboardHit(sf::Time dt);
+	void UpdateKeyboardHit();
+	void CheckCollisionWithWalls(sf::Vector2f);
 	bool Intersect(unsigned int it);
+	bool map_collision(float i_x, float i_y);
+	void SetupPlayer();
+	void SetMap(Map& map);
 	void SetPosition(sf::Vector2f);
 	void SetPosition(float,float);
+
 	void Player::SetMouse(bool isUnlocked);
 	sf::Vector2f GetPosition() const;
 	inline float toRadian(float degree) { return (PI / 180) * degree; }
@@ -44,6 +49,12 @@ public:
 	inline float dTan(float degree) { return tan(toRadian( degree)); }
 
 private:
+
+	sf::Sprite m_wallSprite;
+	sf::Sprite m_floorSprite;
 	sf::Vector2f previous;
+	TextureManager m_WallTexureManager;
+	TextureManager m_FloorTextureManager;
+	Map m_map;
 	bool mouseIslocked;
 };

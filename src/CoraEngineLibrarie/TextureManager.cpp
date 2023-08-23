@@ -1,4 +1,9 @@
 #include <CoraEngineLibrarie/TextureManager.hpp>
+#include <iostream>
+
+TextureManager::TextureManager()
+{
+}
 
 TextureManager::TextureManager(std::string filePath)
 {
@@ -7,12 +12,13 @@ TextureManager::TextureManager(std::string filePath)
         sf::Texture texture;
         texture.loadFromFile(entry.path().string());
         m_textures.push_back(texture);
-        std::cout << entry.path().filename().string() <<" à été Ajouté" << std::endl;
+        std::cout << entry.path().filename().string() <<" Has added " << std::endl;
     }
 }
 
 
-sf::Texture* TextureManager::GetTexture(int index) {
+
+sf::Texture* TextureManager::GetTexture(int index)  {
     return &m_textures[index];
 }
 

@@ -73,6 +73,10 @@ sf::Vector2u Window::GetSize()
 	return m_window.getSize();
 }
 
+void Window::SetSize(sf::Vector2u newSize)
+{
+	return m_window.setSize(newSize);
+}
 
 void Window::SetVerticalSyncEnable(bool isactive)
 {

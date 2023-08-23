@@ -134,6 +134,11 @@ xmake version 2.8.1+dev.732d60063
     <XmakeRunDir>$(XmakeProjectDir)\bin</XmakeRunDir>
   </PropertyGroup>
   <Import Project="$(XmakeProgramDir)\plugins\project\vsxmake\vsproj\Xmake.props" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+    <Link>
+      <Profile>true</Profile>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Export.hpp" />
     <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Global.hpp" />
@@ -141,11 +146,14 @@ xmake version 2.8.1+dev.732d60063
     <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Math.hpp" />
     <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Player.hpp" />
     <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Shape.hpp" />
+    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\TextureManager.hpp" />
     <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Window.hpp" />
-    <ClInclude Include="..\..\include\CoraEngineLibrarie\TextureManager.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\Map.cpp">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\MapCollision.cpp">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\Player.cpp">
@@ -157,10 +165,12 @@ xmake version 2.8.1+dev.732d60063
     <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\Shape.cpp">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
+    <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\TextureManager.cpp">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\Window.cpp">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="..\..\src\CoraEngineLibrarie\TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

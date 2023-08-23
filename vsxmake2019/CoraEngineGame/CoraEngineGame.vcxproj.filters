@@ -18,7 +18,6 @@ xmake version 2.8.1+dev.732d60063
     <Filter Include="src\CoraEngineGame">
       <UniqueIdentifier>{E3EE7EC1-C0CA-4F16-A770-D0ADB540B3B3}</UniqueIdentifier>
     </Filter>
-
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildProjectDirectory)\Xmake.Custom.props">
@@ -33,30 +32,15 @@ xmake version 2.8.1+dev.732d60063
     <None Include="$(MSBuildProjectDirectory)\Xmake.Custom.items.filters">
       <Filter>Properties</Filter>
     </None>
-    <None Include="$(XmakeScriptDir)\xmake.lua">
-      <Filter>Properties</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
-
-
-  </ItemGroup>
-  <ItemGroup>
-
     <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineGame\main.cpp">
-      <Filter>src\CoraEngineGame</Filter>
+      <Filter>Properties</Filter>
     </ClCompile>
-
-
-
   </ItemGroup>
   <ItemGroup>
-
   </ItemGroup>
   <ItemGroup>
-
-
   </ItemGroup>
-  <Import Condition="Exists('$(MSBuildThisFileDirectory)\Xmake.Custom.files.filters')"
-    Project="$(MSBuildThisFileDirectory)\Xmake.Custom.files.filters" />
+  <Import Condition="Exists('$(MSBuildThisFileDirectory)\Xmake.Custom.files.filters')" Project="$(MSBuildThisFileDirectory)\Xmake.Custom.files.filters" />
 </Project>

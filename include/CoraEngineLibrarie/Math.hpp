@@ -1,9 +1,16 @@
 #pragma once
 #include  <SFML/Graphics.hpp>
+#include  <CoraEngineLibrarie/Math.hpp>
 
 
 struct Math
 {
+	//calculates det product of 2 vectors
+	inline static  float det (const sf::Vector2f& lv, const sf::Vector2f& rv)
+	{
+		return lv.x * rv.x - lv.y * rv.y;
+	}
+
 	//calculates dot product of 2 vectors
 	inline static  float dot(const sf::Vector2f& lv, const sf::Vector2f& rv)
 	{
@@ -33,11 +40,15 @@ struct Math
 		return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
 	}
 
+	sf::Vector2f static  CalculateNormal(const sf::Vector2f& vector) {
+		return sf::Vector2f(-vector.y, vector.x);
+	}
+
 	float static  deg_to_rad(float i_degrees)
 	{
 		//After googling I found out that smart people use radians because of calculus.
 		//I don't know what that word means so I'll keep using degrees.
-		return PI * i_degrees / 180;
+		return 3.1415f * i_degrees / 180;
 	}
 
 	float static  get_degrees(float i_degrees)

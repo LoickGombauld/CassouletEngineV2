@@ -64,11 +64,16 @@ sf::RectangleShape Shape::GethandleRect()
 	return m_rshape;
 }
 
-sf::FloatRect Shape:: GetGlobalRectBounds()
+sf::FloatRect Shape:: GetGlobalRectBounds() const
 {
 	return m_rshape.getGlobalBounds();
 }
-sf::FloatRect Shape:: GetGlobalCicleBound()
+sf::FloatRect Shape:: GetGlobalCircleBound() const
 {
 	return m_rshape.getGlobalBounds();
+}
+
+sf::Vector2f Shape::GetRectSize() const
+{
+	return m_rshape.getSize();
 }
