@@ -63,6 +63,7 @@ void Player::Draw(Window& mapWindow)
 	for (unsigned short a = 0; a < WIDTHSCREEN; a++)
 	{
 		float ray_direction = Fov * (floor(0.5f * WIDTHSCREEN) - a) / (WIDTHSCREEN - 1);
+
 		float ray_projection_position = 0.5f * tan(Math::deg_to_rad(ray_direction)) / tan(Math::deg_to_rad(0.5f * Fov));
 
 		//Current column's position on the screen.
@@ -79,7 +80,7 @@ void Player::Draw(Window& mapWindow)
 		}
 		if (previous_column < current_column)
 		{
-			float view_ray = Math::CalculateDistance(m_vecRays[a][1].position, m_vecRays[a][0].position);;
+			float view_ray = Math::CalculateDistance(m_vecRays[a][1].position, m_vecRays[a][0].position);
 			float ray_end_x = ray_start_x + view_ray * cos(Math::deg_to_rad(Math::get_degrees(info.m_angleX + ray_direction)));
 			float ray_end_y = ray_start_y - view_ray * sin(Math::deg_to_rad(Math::get_degrees(info.m_angleY + ray_direction)));
 			//This is the position of the wall texture column we need to draw.
@@ -94,14 +95,23 @@ void Player::Draw(Window& mapWindow)
 			shape.setPosition(current_column, round(floor_level - 0.5f * column_height));
 
 			previous_column = current_column;
+
+			//Checking if the ray hit was vertical or horizontal.
+			if (abs(ray_end_x - blockSize * round(ray_end_x / blockSize)) < abs(ray_end_y - blockSize * round(ray_end_y / blockSize)))
+			{
+				wall_texture_column_x = ray_end_y - blockSize * floor(ray_end_y / blockSize);
+			}
+			else
+			{
+				wall_texture_column_x = blockSize * ceil(ray_end_x / blockSize) - ray_end_x;
+			}
+
 			m_wallSprite.setPosition(current_column, round(floor_level - 0.5f * column_height));
 			m_wallSprite.setTextureRect(sf::IntRect(static_cast<unsigned short>(round(wall_texture_column_x)), 0, 1, blockSize));
 			m_wallSprite.setScale(std::max(1.f, static_cast<float>(next_column - current_column)), column_height / static_cast<float>(blockSize));
 
 			m_renderWindow->GetHandle()->draw(m_wallSprite);
 			m_renderWindow->GetHandle()->draw(shape);
-
-
 		}
 	}
 }
@@ -116,7 +126,7 @@ void Player::SetupPlayer()
 	info.m_camera.SetFillColor(sf::Color(0, 255, 0));
 	info.m_camera.SetOrigin(sf::Vector2f(10, 10));
 	info.m_colliderRadius = PlayerColliderRadius;
-	info.m_speedMove = SpeedMove;
+	info.m_speedMove = SpeedMove / 10;
 	info.m_speedAngle = SpeedAngle;
 	info.m_position = sf::Vector2f{ 0,0 };
 	info.m_rayLength = RayLength;
@@ -145,6 +155,17 @@ void Player::SetupPlayer()
 void Player::Update()
 {
 	sf::Time dt = info.m_clock.restart();
+
+	if (info.m_angleX > 0 && info.m_angleX < 90)
+		info.m_direction = DOWNRIGHT;
+	else if (info.m_angleX < 180 && info.m_angleX > 90)
+		info.m_direction = DOWNLEFT;
+	else if (info.m_angleX < 270 && info.m_angleX > 180)
+		info.m_direction = UPLEFT;
+	else if (info.m_angleX < 360 && info.m_angleX > 270)
+		info.m_direction = UPRIGHT;
+
+
 	UpdateKeyboardHit();
 	Projection();
 }
@@ -223,18 +244,19 @@ void Player::UpdateKeyboardHit() {
 			movement.y += dSin(info.m_angleX + 90) * localspeedMove;
 		}
 
+
 		CheckCollisionWithWalls(movement);
 
 		info.m_camera.SetRotation(info.m_angleX);
 		info.m_camera.SetPostion(info.m_position);
 		std::cout << "Position : " << info.m_position.x << " " << info.m_position.y << std::endl;
+		std::cout << "Rotation : " << info.m_angleX << std::endl;
 	}
-
-
-
 }
 
-void Player::CheckCollisionWithWalls(sf::Vector2f movement) {
+void Player::CheckCollisionWithWalls(sf::Vector2f movement)
+{
+
 	if (0 == map_collision(movement.x + info.m_position.x, movement.y + info.m_position.y))
 	{
 		info.m_position.x += movement.x;
@@ -254,7 +276,10 @@ void Player::CheckCollisionWithWalls(sf::Vector2f movement) {
 		info.m_position.x = blockSize * round(info.m_position.x / blockSize);
 		info.m_position.y = blockSize * round(info.m_position.y / blockSize);
 	}
+
+
 }
+
 
 
 bool Player::map_collision(float i_x, float i_y)
@@ -262,50 +287,12 @@ bool Player::map_collision(float i_x, float i_y)
 	float cell_x = i_x / blockSize;
 	float cell_y = i_y / blockSize;
 
-	for (unsigned char a = 0; a < 4; a++)
+	if (Wall == m_map.GetCellType(cell_x, cell_y))
 	{
-		short x = 0;
-		short y = 0;
-
-		switch (a)
-		{
-		case 0:
-		{
-			x = static_cast<short>(floor(cell_x));
-			y = static_cast<short>(floor(cell_y));
-
-			break;
-		}
-		case 1:
-		{
-			x = static_cast<short>(ceil(cell_x));
-			y = static_cast<short>(floor(cell_y));
-
-			break;
-		}
-		case 2:
-		{
-			x = static_cast<short>(floor(cell_x));
-			y = static_cast<short>(ceil(cell_y));
-
-			break;
-		}
-		case 3:
-		{
-			x = static_cast<short>(ceil(cell_x));
-			y = static_cast<short>(ceil(cell_y));
-		}
-		}
-
-		if (0 <= x && 0 <= y && yCase > y && xCase > x)
-		{
-			if (Wall == m_map.GetCellType(y, x))
-			{
-				return 1;
-			}
-		}
+		std::cout << "Collision" << std::endl;
+		return 1;
 	}
-	std::cout << "Collision" << std::endl;
+
 	return 0;
 }
 
@@ -324,7 +311,7 @@ bool Player::Intersect(unsigned int it) {
 
 		if (mapX >= 0 && mapX < xCase && mapY >= 0 && mapY < yCase)
 		{
-			if (m_map.GetCellType(mapY, mapX) == Wall)
+			if (m_map.GetCellType(mapX, mapY) == Wall)
 			{
 				info.m_intersection.x = dx;
 				info.m_intersection.y = dy;

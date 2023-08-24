@@ -1,8 +1,6 @@
 #include <CoraEngineLibrarie/Map.hpp>
 #include  <CoraEngineLibrarie/Player.hpp>
 
-
-
 Map::Map()
 {
 	GenerateMap();
@@ -10,9 +8,8 @@ Map::Map()
 
 Cell Map::GetCell(int y, int x)
 {
-	return m_map[y][x];
+	return m_map[x][y];
 }
-
 
 
 std::array<std::array<Cell, yCase>, xCase> Map::GetHandle()
@@ -21,8 +18,21 @@ std::array<std::array<Cell, yCase>, xCase> Map::GetHandle()
 }
 CellType Map::GetCellType(int x, int y)
 {
-	return m_map[y][x].GetCellType();
+	return m_map[x][y].GetCellType();
 }
+
+bool Map::ContainPoint(int x, int y, sf::Vector2f& point)
+{
+	if (&m_map[x][y].CellBounds() == nullptr)
+	{
+		return false;
+	}
+	else
+	{
+		return  m_map[x][y].CellBounds().contains(point);
+	}
+}
+
 
 void Map::GenerateMap()
 {
@@ -44,23 +54,24 @@ void Map::GenerateMap()
 			sf::Color pixel = map_sketch.getPixel(a, b);
 
 			auto cellPosition = sf::Vector2f(a * blockSize, b * blockSize);
+			sf::RectangleShape box(sf::Vector2f(blockSize, blockSize));
+
+			box.setPosition(cellPosition);
 			if (pixel == sf::Color(255, 255, 255))
 			{
-				sf::RectangleShape box(sf::Vector2f(blockSize, blockSize));
-				box.setPosition(cellPosition);
 				std::cout << "Wall Placed" << std::endl;
 				m_map[a][b] = Cell(cellPosition, Wall, box);
 				m_walls.push_back(m_map[a][b]);
 			}
 			else
 			{
-				m_map[a][b] = Empty;
+				m_map[a][b] = Cell(cellPosition, Empty, box);
 			}
-
 		}
 
-		m_image = map_sketch;
+
 	}
+	m_image = map_sketch;
 }
 
 void Map::SetWallTexture(int index, sf::Texture* walltexture)
@@ -68,14 +79,28 @@ void Map::SetWallTexture(int index, sf::Texture* walltexture)
 	m_walls[index].GetShape().setTexture(walltexture);
 }
 
-void Map::Draw(Window& renderWindow)
+
+void Map::Draw(Window& renderWindow, sf::Texture* walltexture, sf::Texture* floortexture)
 {
 	for (unsigned char a = 0; a < xCase; a++)
 	{
 		for (unsigned char b = 0; b < yCase; b++)
 		{
-			Shape box(m_map[a][b].GetShape());
-			renderWindow.DrawRectShape(box);
+			auto shape = m_map[a][b].GetShape();
+			switch (m_map[a][b].GetCellType()) {
+			case Empty: 
+			shape.setTexture(floortexture);
+				
+				break;
+			case Wall: 
+			shape.setTexture(walltexture);
+				break;
+			case Win:
+				
+				break;
+			default:;
+			}
+			renderWindow.GetHandle()->draw(shape);
 		}
 	}
 }

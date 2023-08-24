@@ -7,6 +7,12 @@
 #include  <CoraEngineLibrarie/Map.hpp>
 #include <CoraEngineLibrarie/TextureManager.hpp>
 
+
+enum CASSOULET_DLL Direction
+{
+	DOWNLEFT,DOWNRIGHT,UPLEFT,UPRIGHT,
+}; 
+
 struct CASSOULET_DLL CameraInfo {
 public:
 	Shape m_camera;
@@ -16,6 +22,7 @@ public:
 	float m_radius;
 	float m_speedMove, m_speedAngle;
 	float m_colliderRadius;
+	Direction m_direction;
 	std::array<float, WIDTHSCREEN> view_rays;
 	sf::Clock m_clock;
 };

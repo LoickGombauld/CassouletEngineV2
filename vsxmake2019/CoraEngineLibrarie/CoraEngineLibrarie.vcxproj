@@ -134,13 +134,9 @@ xmake version 2.8.1+dev.732d60063
     <XmakeRunDir>$(XmakeProjectDir)\bin</XmakeRunDir>
   </PropertyGroup>
   <Import Project="$(XmakeProgramDir)\plugins\project\vsxmake\vsproj\Xmake.props" />
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
-    <Link>
-      <Profile>true</Profile>
-    </Link>
-  </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Export.hpp" />
+    <ClInclude Include="..\..\include\CoraEngineLibrarie\Fonts.hpp" />
     <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Global.hpp" />
     <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Map.hpp" />
     <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Math.hpp" />
@@ -150,6 +146,9 @@ xmake version 2.8.1+dev.732d60063
     <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Window.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\CoraEngineLibrarie\Fonts.cpp">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\Map.cpp">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>

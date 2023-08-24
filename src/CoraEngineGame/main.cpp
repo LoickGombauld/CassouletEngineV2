@@ -17,17 +17,14 @@ int main()
 	window.SetVerticalSyncEnable(true);
 	window.SetMouseCursorVisible(false);
 
-
-	TextureManager FloorManager("Resources/Floor");
-	TextureManager WallManager("Resources/Wall");
+	Fonts fonts;
+	TextureManager FloorManager("Floor");
+	TextureManager WallManager("Wall");
 	Map map;
 	Player player(window ,WallManager,FloorManager,map);
 
 	map.SpawnPlayerOnMap(player);
-	//for (int i = 0 ; i < map.m_walls.size() ; i++ )
-	//{
-	//	map.SetWallTexture(i, WallManager.GetTexture(0));
-	//}
+
 
 	while (window.isOpen())
 	{
@@ -74,8 +71,8 @@ int main()
 		window.Clear(sf::Color::Cyan);
 		mapWindow.Clear();
 
+		map.Draw(mapWindow,WallManager.GetTexture(0),FloorManager.GetTexture(0) );
 		player.Draw(mapWindow);
-		map.Draw(mapWindow);
 
 
 		window.Display();

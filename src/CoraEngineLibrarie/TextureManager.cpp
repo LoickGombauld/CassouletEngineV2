@@ -1,13 +1,15 @@
 #include <CoraEngineLibrarie/TextureManager.hpp>
 #include <iostream>
 
+
+
 TextureManager::TextureManager()
 {
 }
 
 TextureManager::TextureManager(std::string filePath)
 {
-    for (const auto& entry : std::filesystem::directory_iterator(filePath)) {
+    for (const auto& entry : std::filesystem::directory_iterator("Resources/" + filePath)) {
 
         sf::Texture texture;
         texture.loadFromFile(entry.path().string());

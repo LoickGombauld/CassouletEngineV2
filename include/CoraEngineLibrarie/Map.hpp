@@ -8,6 +8,8 @@
 #include  <CoraEngineLibrarie/TextureManager.hpp>
 #include  <iostream>
 
+#include <CoraEngineLibrarie/Fonts.hpp>
+
 class CASSOULET_DLL Player;
 
 class CASSOULET_DLL Map
@@ -20,12 +22,13 @@ public:
 	Cell GetCell(int y,int x);
 	std::array<std::array<Cell, yCase>, xCase> GetHandle();
 	CellType GetCellType(int x, int y);
+	bool ContainPoint(int x, int y, sf::Vector2f& point);
 	std::vector<Cell> m_walls;
 	void SpawnPlayerOnMap(Player& player);
-	void Draw(Window& renderWindow);
+	void Draw(Window& renderWindow, sf::Texture* walltexture, sf::Texture* floortexture);
 	void SetWallTexture(int index, sf::Texture* walltexture);
-
 private:
 	void GenerateMap();
 	sf::Image m_image;
+
 };
