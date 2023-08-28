@@ -43,30 +43,6 @@ int main()
 		{
 			player.SetMouse(true);
 		}
-
-		//for (unsigned short a = 0; a < ceil(blockSize * xCase / static_cast<float>(blockSize)); a++)
-		//{
-		//	for (unsigned short b = 0; b < ceil(blockSize * yCase / static_cast<float>(blockSize)); b++)
-		//	{
-		//		map_grid_cell_sprite.setPosition(static_cast<float>(blockSize * a), static_cast<float>(blockSize * b));
-
-		//		window.GetHandle()->draw(map_grid_cell_sprite);
-		//	}
-		//}
-
-		//for (unsigned short a = 0; a < xCase; a++)
-		//{
-		//	for (unsigned short b = 0; b < yCase; b++)
-		//	{
-		//		if (map.GetCell(a,b) == Wall)
-		//		{
-		//			map_wall_sprite.setPosition(static_cast<float>(blockSize * a), static_cast<float>(blockSize * b));
-
-		//			window.GetHandle()->draw(map_wall_sprite);
-		//		}
-		//	}
-		//}
-
 		player.Update();
 		window.Clear(sf::Color::Cyan);
 		mapWindow.Clear();

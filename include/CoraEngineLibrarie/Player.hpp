@@ -7,12 +7,6 @@
 #include  <CoraEngineLibrarie/Map.hpp>
 #include <CoraEngineLibrarie/TextureManager.hpp>
 
-
-enum CASSOULET_DLL Direction
-{
-	DOWNLEFT,DOWNRIGHT,UPLEFT,UPRIGHT,
-}; 
-
 struct CASSOULET_DLL CameraInfo {
 public:
 	Shape m_camera;
@@ -22,7 +16,7 @@ public:
 	float m_radius;
 	float m_speedMove, m_speedAngle;
 	float m_colliderRadius;
-	Direction m_direction;
+
 	std::array<float, WIDTHSCREEN> view_rays;
 	sf::Clock m_clock;
 };
@@ -40,7 +34,8 @@ public:
 	void Update();
 	void Projection();
 	void UpdateKeyboardHit();
-	void CheckCollisionWithWalls(sf::Vector2f);
+	void UpdateRay();
+	void CheckCollisionWithWalls(sf::Vector2f&);
 	bool Intersect(unsigned int it);
 	bool map_collision(float i_x, float i_y);
 	void SetupPlayer();

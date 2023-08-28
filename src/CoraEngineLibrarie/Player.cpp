@@ -33,6 +33,26 @@ Player::Player(Window& window, TextureManager& wallTexture, TextureManager& floo
 
 }
 
+void Player::SetupPlayer()
+{
+	info.m_radius = Radius;
+	info.m_camera.SetRadius(info.m_radius);
+	info.m_camera.SetFillColor(sf::Color(0, 255, 0));
+	info.m_camera.SetOrigin(sf::Vector2f(10, 10));
+	info.m_colliderRadius = PlayerColliderRadius;
+	info.m_speedMove = SpeedMove / 10;
+	info.m_speedAngle = SpeedAngle;
+	info.m_position = sf::Vector2f{ 0,0 };
+	info.m_rayLength = RENDER_DISTANCE;
+
+	for (unsigned int i = 0; i < WIDTHSCREEN; i++)
+	{
+		sf::VertexArray ray(sf::Lines, 2);
+		ray[0].color = sf::Color::Red;
+		ray[1].color = sf::Color::Red;
+		m_vecRays.push_back(ray);
+	}
+}
 void Player::Draw(Window& mapWindow)
 {
 	for (auto& vec : m_vecRays)
@@ -62,6 +82,7 @@ void Player::Draw(Window& mapWindow)
 
 	for (unsigned short a = 0; a < WIDTHSCREEN; a++)
 	{
+
 		float ray_direction = Fov * (floor(0.5f * WIDTHSCREEN) - a) / (WIDTHSCREEN - 1);
 
 		float ray_projection_position = 0.5f * tan(Math::deg_to_rad(ray_direction)) / tan(Math::deg_to_rad(0.5f * Fov));
@@ -80,15 +101,13 @@ void Player::Draw(Window& mapWindow)
 		}
 		if (previous_column < current_column)
 		{
-			float view_ray = Math::CalculateDistance(m_vecRays[a][1].position, m_vecRays[a][0].position);
-			float ray_end_x = ray_start_x + view_ray * cos(Math::deg_to_rad(Math::get_degrees(info.m_angleX + ray_direction)));
-			float ray_end_y = ray_start_y - view_ray * sin(Math::deg_to_rad(Math::get_degrees(info.m_angleY + ray_direction)));
-			//This is the position of the wall texture column we need to draw.
+			float ray_end_x = ray_start_x + info.view_rays[a] * dCos((info.m_angleX + ray_direction));
+			float ray_end_y = ray_start_y - info.view_rays[a] * dSin((info.m_angleY + ray_direction));
 			float wall_texture_column_x = 0;
 
-			unsigned char brightness = static_cast<unsigned char>(round(255 * std::max<float>(0, 2 * view_ray / RENDER_DISTANCE - 1)));
+			unsigned char brightness = static_cast<unsigned char>(round(255 * std::max<float>(0, 2 * info.view_rays[a] / RENDER_DISTANCE - 1)));
 
-			unsigned short column_height = static_cast<unsigned short>(HEIGHTSCREEN * projection_distance / (view_ray * cos(Math::deg_to_rad(ray_direction))));
+			unsigned short column_height = static_cast<unsigned short>(HEIGHTSCREEN * projection_distance / (info.view_rays[a] * dCos(ray_direction)));
 
 			sf::RectangleShape shape(sf::Vector2f(std::max(1, next_column - current_column), column_height));
 			shape.setFillColor(sf::Color(73, 255, 255, brightness));
@@ -96,7 +115,6 @@ void Player::Draw(Window& mapWindow)
 
 			previous_column = current_column;
 
-			//Checking if the ray hit was vertical or horizontal.
 			if (abs(ray_end_x - blockSize * round(ray_end_x / blockSize)) < abs(ray_end_y - blockSize * round(ray_end_y / blockSize)))
 			{
 				wall_texture_column_x = ray_end_y - blockSize * floor(ray_end_y / blockSize);
@@ -108,7 +126,7 @@ void Player::Draw(Window& mapWindow)
 
 			m_wallSprite.setPosition(current_column, round(floor_level - 0.5f * column_height));
 			m_wallSprite.setTextureRect(sf::IntRect(static_cast<unsigned short>(round(wall_texture_column_x)), 0, 1, blockSize));
-			m_wallSprite.setScale(std::max(1.f, static_cast<float>(next_column - current_column)), column_height / static_cast<float>(blockSize));
+			m_wallSprite.setScale(std::max(1, next_column - current_column), column_height / static_cast<float>(blockSize));
 
 			m_renderWindow->GetHandle()->draw(m_wallSprite);
 			m_renderWindow->GetHandle()->draw(shape);
@@ -119,53 +137,10 @@ void Player::Draw(Window& mapWindow)
 
 
 
-void Player::SetupPlayer()
-{
-	info.m_radius = Radius;
-	info.m_camera.SetRadius(info.m_radius);
-	info.m_camera.SetFillColor(sf::Color(0, 255, 0));
-	info.m_camera.SetOrigin(sf::Vector2f(10, 10));
-	info.m_colliderRadius = PlayerColliderRadius;
-	info.m_speedMove = SpeedMove / 10;
-	info.m_speedAngle = SpeedAngle;
-	info.m_position = sf::Vector2f{ 0,0 };
-	info.m_rayLength = RayLength;
-
-	for (unsigned int i = 0; i < WIDTHSCREEN; i++)
-	{
-		sf::VertexArray ray(sf::Lines, 2);
-		ray[0].color = sf::Color::Red;
-		ray[1].color = sf::Color::Red;
-		m_vecRays.push_back(ray);
-	}
-
-	// Nombre total de rayons de vue
-	int numRays = WIDTHSCREEN; // Vous pouvez ajuster ce nombre selon vos besoins
-
-	// Calculer l'intervalle d'angle entre les rayons
-	float angleStep = 360 / static_cast<float>(numRays);
-
-	// Calculer les angles pour chaque rayon et les ajouter à view_rays
-	for (int i = 0; i < numRays; ++i) {
-		float rayAngle = static_cast<float>(i) * angleStep;
-		info.view_rays[i] = rayAngle;
-	}
-}
 
 void Player::Update()
 {
 	sf::Time dt = info.m_clock.restart();
-
-	if (info.m_angleX > 0 && info.m_angleX < 90)
-		info.m_direction = DOWNRIGHT;
-	else if (info.m_angleX < 180 && info.m_angleX > 90)
-		info.m_direction = DOWNLEFT;
-	else if (info.m_angleX < 270 && info.m_angleX > 180)
-		info.m_direction = UPLEFT;
-	else if (info.m_angleX < 360 && info.m_angleX > 270)
-		info.m_direction = UPRIGHT;
-
-
 	UpdateKeyboardHit();
 	Projection();
 }
@@ -193,9 +168,6 @@ void Player::SetMouse(bool isUnlocked)
 }
 
 void Player::UpdateKeyboardHit() {
-
-	previous = info.m_position;
-
 
 	//Mouse control!
 	//By the way, do I need to write comments? Can't you just watch my video? I've already explained everything there.
@@ -227,7 +199,7 @@ void Player::UpdateKeyboardHit() {
 			updownIspressed = true;
 		}
 
-		int localspeedMove = info.m_speedMove;
+		float localspeedMove = info.m_speedMove;
 		if (updownIspressed)
 		{
 			localspeedMove /= 2;
@@ -243,10 +215,10 @@ void Player::UpdateKeyboardHit() {
 			movement.x += dCos(info.m_angleX + 90) * localspeedMove;
 			movement.y += dSin(info.m_angleX + 90) * localspeedMove;
 		}
-
+		UpdateRay();
 
 		CheckCollisionWithWalls(movement);
-
+		
 		info.m_camera.SetRotation(info.m_angleX);
 		info.m_camera.SetPostion(info.m_position);
 		std::cout << "Position : " << info.m_position.x << " " << info.m_position.y << std::endl;
@@ -254,7 +226,135 @@ void Player::UpdateKeyboardHit() {
 	}
 }
 
-void Player::CheckCollisionWithWalls(sf::Vector2f movement)
+
+void Player::UpdateRay()
+{
+	for (unsigned short a = 0; a < WIDTHSCREEN ; a ++)
+	{
+		float view_rays = -(int)Math::CalculateDistance(m_vecRays[a][0].position, m_vecRays[a][1].position);
+		info.view_rays[a] = std::min(  RENDER_DISTANCE,view_rays);
+	}
+
+	//for (unsigned short a = 0; a < WIDTHSCREEN; a++)
+	//{
+	//	char cell_step_x = 0;
+	//	char cell_step_y = 0;
+
+	//	float ray_direction = Math::get_degrees(info.m_angleX + Fov * (floor(0.5f * WIDTHSCREEN) - a) / (WIDTHSCREEN - 1));
+	//	float ray_direction_x = dCos(ray_direction);
+	//	float ray_direction_y = dSin(ray_direction);
+	//	//This is the value we need.
+	//	float ray_length = 0;
+	//	float ray_start_x = m_vecRays[a][0].position.x + 0.5f * blockSize;
+	//	float ray_start_y = m_vecRays[a][0].position.y + 0.5f * blockSize;
+	//	//This ray checks for horizontal collisions.
+	//	float x_ray_length = 0;
+	//	//This ray checks for vertical collisions.
+	//	float y_ray_length = 0;
+	//	//This is the length of the ray after moving 1 unit along the x-axis.
+	//	float x_ray_unit_length = static_cast<float>(blockSize * sqrt(1 + pow(ray_direction_y / ray_direction_x, 2)));
+	//	//This is the length of the ray after moving 1 unit along the y-axis.
+	//	float y_ray_unit_length = static_cast<float>(blockSize * sqrt(1 + pow(ray_direction_x / ray_direction_y, 2)));
+
+	//	unsigned char current_cell_x = static_cast<unsigned char>(ray_start_x / blockSize);
+	//	unsigned char current_cell_y = static_cast<unsigned char>(ray_start_y / blockSize);
+
+	//	if (0 > ray_direction_x)
+	//	{
+	//		cell_step_x = 1;
+
+	//		//In order for the algorithm to work, the ray must start at the cell borders.
+	//		//So if the starting position of the ray is not a cell border (which is very likely), we'll stretch it to the closest one.
+	//		x_ray_length = x_ray_unit_length * (ray_start_x / blockSize + current_cell_x);
+	//	}
+	//	else if (0 < ray_direction_x)
+	//	{
+	//		cell_step_x = -1;
+
+	//		x_ray_length = x_ray_unit_length * (1 + current_cell_x - ray_start_x / blockSize);
+	//	}
+	//	else
+	//	{
+	//		cell_step_x = 0;
+	//	}
+
+	//	if (0 > ray_direction_y)
+	//	{
+	//		cell_step_y = 1;
+
+	//		y_ray_length = y_ray_unit_length * (ray_start_y / blockSize - current_cell_y);
+	//	}
+	//	else if (0 < ray_direction_y)
+	//	{
+	//		cell_step_y = -1;
+
+	//		y_ray_length = y_ray_unit_length * (1 + current_cell_y - ray_start_y / blockSize);
+	//	}
+	//	else
+	//	{
+	//		cell_step_y = 0;
+	//	}
+
+	//	//We continue casting the ray until it reaches the render distance.
+	//	while (RENDER_DISTANCE >= ray_length)
+	//	{
+	//		//In case the ray hits a corner (which is very unlikely, but I like to add this kind of stuff just in case).
+	//		bool corner_collision = 0;
+
+	//		//We stretch the shortest ray.
+	//		if (x_ray_length < y_ray_length)
+	//		{
+	//			ray_length = x_ray_length;
+	//			x_ray_length += x_ray_unit_length;
+
+	//			current_cell_x += cell_step_x;
+	//		}
+	//		else if (x_ray_length > y_ray_length)
+	//		{
+	//			ray_length = y_ray_length;
+	//			y_ray_length += y_ray_unit_length;
+
+	//			current_cell_y += cell_step_y;
+	//		}
+	//		else
+	//		{
+	//			//If the rays are equal, that means we hit the corner, so we stretch both rays.
+	//			corner_collision = 1;
+
+	//			ray_length = x_ray_length;
+	//			x_ray_length += x_ray_unit_length;
+	//			y_ray_length += y_ray_unit_length;
+
+	//			current_cell_x += cell_step_x;
+	//			current_cell_y += cell_step_y;
+	//		}
+
+	//		//Making sure the current cell we're checking is inside our map.
+	//		if (0 <= current_cell_x && 0 <= current_cell_y && yCase > current_cell_y && xCase > current_cell_x)
+	//		{
+	//			if (Wall == m_map.GetCellType(current_cell_x, current_cell_y))
+	//			{
+	//				//We stop casting the ray if it hits the wall.
+	//				break;
+	//			}
+	//			 if (1 == corner_collision)
+	//			{
+	//				//The ray can't go through 2 walls standing diagonally.
+	//				if (Wall == m_map.GetCellType(current_cell_x - cell_step_x, current_cell_y) && Wall == m_map.GetCellType(current_cell_x, current_cell_y - cell_step_y))
+	//				{
+	//					break;
+	//				}
+	//			}
+	//		}
+	//	}
+
+	//	//The ray's length must be less than or equal to the render distance.
+	//	ray_length = std::min(RENDER_DISTANCE, ray_length);
+
+	//	info.view_rays[a] = ray_length;
+	//}
+}
+void Player::CheckCollisionWithWalls(sf::Vector2f& movement)
 {
 
 	if (0 == map_collision(movement.x + info.m_position.x, movement.y + info.m_position.y))

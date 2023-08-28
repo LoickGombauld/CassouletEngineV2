@@ -7,20 +7,19 @@
 
 const float PI = 3.1415f;
 const unsigned int xCase = 19, yCase = 19;
-const unsigned char blockSize = 30;
+const unsigned char blockSize = 32;
 constexpr unsigned short WIDTHSCREEN = xCase * blockSize,
 
 HEIGHTSCREEN = yCase * blockSize;
-const float RENDER_DISTANCE = 100;
+const float RENDER_DISTANCE = 200;
 const float PlayerColliderRadius = 1;
 const unsigned int Radius = 10;
-const float SpeedMove = 10.f;
+const float SpeedMove = 5.f;
 const float SpeedAngle = 5;
 const float repulsionMagnitude = 10;
 const float elasticityCoefficient = 10;
 const float interpolationFactor = 25;
 const float Fov = 90;
-const float RayLength = 200
 
 ;
 
