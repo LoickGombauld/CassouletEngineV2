@@ -60,7 +60,7 @@ void Player::Draw(Window& mapWindow)
 	mapWindow.DrawCircleShape(info.m_camera);
 	float projection_distance = 0.5f * blockSize / tan(Math::deg_to_rad(0.5f * Fov));
 	float floor_level = round(0.5f * HEIGHTSCREEN * (1 + tan(Math::deg_to_rad(info.m_angleY)) / tan(Math::deg_to_rad(0.5f * Fov))));
-	float ray_start_x = info.m_position.y + 0.5f * blockSize;
+	float ray_start_x = info.m_position.x + 0.5f * blockSize;
 	float ray_start_y = info.m_position.y + 0.5f * blockSize;
 	short previous_column = SHRT_MIN;
 
@@ -101,11 +101,11 @@ void Player::Draw(Window& mapWindow)
 		}
 		if (previous_column < current_column)
 		{
-			float ray_end_x = ray_start_x + info.view_rays[a] * dCos((info.m_angleX + ray_direction));
-			float ray_end_y = ray_start_y - info.view_rays[a] * dSin((info.m_angleY + ray_direction));
+			float ray_end_x =  m_vecRays[a][1].position.x;
+			float ray_end_y =  m_vecRays[a][1].position.y;
 			float wall_texture_column_x = 0;
 
-			unsigned char brightness = static_cast<unsigned char>(round(255 * std::max<float>(0, 2 * info.view_rays[a] / RENDER_DISTANCE - 1)));
+			unsigned char brightness = static_cast<unsigned char>(round(255 * std::max<float>(0, 2 * info.view_rays[a] / info.m_rayLength - 1)));
 
 			unsigned short column_height = static_cast<unsigned short>(HEIGHTSCREEN * projection_distance / (info.view_rays[a] * dCos(ray_direction)));
 
@@ -145,21 +145,6 @@ void Player::Update()
 	Projection();
 }
 
-void Player::Projection()
-{
-	for (unsigned int i = 0; i < m_vecRays.size(); i++)
-	{
-		m_vecRays[i][0].position = info.m_position;
-		if (Intersect(i))
-		{
-			m_vecRays[i][1].position = info.m_intersection;
-		}
-		else {
-			m_vecRays[i][1].position = { info.m_position.x + info.m_rayLength * dCos((info.m_angleX + Fov / 2) - i * (Fov / WIDTHSCREEN))
-			,info.m_position.y + info.m_rayLength * dSin((info.m_angleX + Fov / 2) - i * (Fov / WIDTHSCREEN)) };
-		}
-	}
-}
 
 void Player::SetMouse(bool isUnlocked)
 {
@@ -181,44 +166,40 @@ void Player::UpdateKeyboardHit() {
 		float rotation_vertical = Fov * (window_center_y - sf::Mouse::getPosition(*m_renderWindow->GetHandle()).y) / m_renderWindow->GetSize().y * info.m_speedAngle;
 
 		info.m_angleX = Math::get_degrees(info.m_angleX + rotation_horizontal);
-		info.m_angleY = std::clamp<float>(info.m_angleY + rotation_vertical, -89, 89);
+		info.m_angleY = std::clamp<float>(info.m_angleY + rotation_vertical, -90, 90);
 
 		sf::Mouse::setPosition(sf::Vector2i(window_center_x, window_center_y), *m_renderWindow->GetHandle());
 		sf::Vector2f movement(0.0f, 0.0f); // Vecteur de mouvement
-		bool updownIspressed = false;
+
 		if (1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 		{
 			movement.x += dCos(info.m_angleX) * info.m_speedMove;
 			movement.y += dSin(info.m_angleX) * info.m_speedMove;
-			updownIspressed = true;
+
 		}
 		else if (1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 		{
 			movement.x -= dCos(info.m_angleX) * info.m_speedMove;
 			movement.y -= dSin(info.m_angleX) * info.m_speedMove;
-			updownIspressed = true;
+
 		}
 
-		float localspeedMove = info.m_speedMove;
-		if (updownIspressed)
-		{
-			localspeedMove /= 2;
-		}
 
 		if (1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 		{
-			movement.x += dCos(info.m_angleX - 90) * localspeedMove;
-			movement.y += dSin(info.m_angleX - 90) * localspeedMove;
+			movement.x += dCos(info.m_angleX - 90) * info.m_speedMove;
+			movement.y += dSin(info.m_angleX - 90) * info.m_speedMove;
 		}
 		else if (1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 		{
-			movement.x += dCos(info.m_angleX + 90) * localspeedMove;
-			movement.y += dSin(info.m_angleX + 90) * localspeedMove;
+			movement.x += dCos(info.m_angleX + 90) * info.m_speedMove;
+			movement.y += dSin(info.m_angleX + 90) * info.m_speedMove;
 		}
+
 		UpdateRay();
 
 		CheckCollisionWithWalls(movement);
-		
+
 		info.m_camera.SetRotation(info.m_angleX);
 		info.m_camera.SetPostion(info.m_position);
 		std::cout << "Position : " << info.m_position.x << " " << info.m_position.y << std::endl;
@@ -229,22 +210,28 @@ void Player::UpdateKeyboardHit() {
 
 void Player::UpdateRay()
 {
-	for (unsigned short a = 0; a < WIDTHSCREEN ; a ++)
+	for (unsigned short a = 0; a < WIDTHSCREEN; a++)
 	{
-		float view_rays = -(int)Math::CalculateDistance(m_vecRays[a][0].position, m_vecRays[a][1].position);
-		info.view_rays[a] = std::min(  RENDER_DISTANCE,view_rays);
+		sf::Vector2f pos0 = m_vecRays[a][0].position;
+		sf::Vector2f pos1 = m_vecRays[a][1].position;
+
+		pos0 = Math::CalculateNormal(pos0);
+		pos1 = Math::CalculateNormal(pos1);
+		float ray_length = Math::CalculateDistance(pos0, pos1);
+		info.view_rays[a] = ray_length;
 	}
 
 	//for (unsigned short a = 0; a < WIDTHSCREEN; a++)
 	//{
-	//	char cell_step_x = 0;
+	//	sf::Vector2f pos0 = m_vecRays[a][0].position;
+	//	sf::Vector2f pos1 = m_vecRays[a][1].position;	
+	//	float ray_length = Math::CalculateDistance(pos0, pos1);;
 	//	char cell_step_y = 0;
-
-	//	float ray_direction = Math::get_degrees(info.m_angleX + Fov * (floor(0.5f * WIDTHSCREEN) - a) / (WIDTHSCREEN - 1));
+	//	char cell_step_x = 0;
+	//	float ray_direction = info.m_angleX + Fov / 2 - a * (Fov / WIDTHSCREEN);
 	//	float ray_direction_x = dCos(ray_direction);
 	//	float ray_direction_y = dSin(ray_direction);
 	//	//This is the value we need.
-	//	float ray_length = 0;
 	//	float ray_start_x = m_vecRays[a][0].position.x + 0.5f * blockSize;
 	//	float ray_start_y = m_vecRays[a][0].position.y + 0.5f * blockSize;
 	//	//This ray checks for horizontal collisions.
@@ -258,20 +245,19 @@ void Player::UpdateRay()
 
 	//	unsigned char current_cell_x = static_cast<unsigned char>(ray_start_x / blockSize);
 	//	unsigned char current_cell_y = static_cast<unsigned char>(ray_start_y / blockSize);
-
 	//	if (0 > ray_direction_x)
 	//	{
 	//		cell_step_x = 1;
 
 	//		//In order for the algorithm to work, the ray must start at the cell borders.
 	//		//So if the starting position of the ray is not a cell border (which is very likely), we'll stretch it to the closest one.
-	//		x_ray_length = x_ray_unit_length * (ray_start_x / blockSize + current_cell_x);
+	//		x_ray_length = x_ray_unit_length * (info.m_position.x / blockSize + current_cell_x);
 	//	}
 	//	else if (0 < ray_direction_x)
 	//	{
 	//		cell_step_x = -1;
 
-	//		x_ray_length = x_ray_unit_length * (1 + current_cell_x - ray_start_x / blockSize);
+	//		x_ray_length = x_ray_unit_length * (1 + current_cell_x - info.m_position.x / blockSize);
 	//	}
 	//	else
 	//	{
@@ -282,13 +268,13 @@ void Player::UpdateRay()
 	//	{
 	//		cell_step_y = 1;
 
-	//		y_ray_length = y_ray_unit_length * (ray_start_y / blockSize - current_cell_y);
+	//		y_ray_length = y_ray_unit_length * (info.m_position.x / blockSize - current_cell_y);
 	//	}
 	//	else if (0 < ray_direction_y)
 	//	{
 	//		cell_step_y = -1;
 
-	//		y_ray_length = y_ray_unit_length * (1 + current_cell_y - ray_start_y / blockSize);
+	//		y_ray_length = y_ray_unit_length * (1 + current_cell_y - info.m_position.x / blockSize);
 	//	}
 	//	else
 	//	{
@@ -304,14 +290,14 @@ void Player::UpdateRay()
 	//		//We stretch the shortest ray.
 	//		if (x_ray_length < y_ray_length)
 	//		{
-	//			ray_length = x_ray_length;
+	//			ray_length += x_ray_length;
 	//			x_ray_length += x_ray_unit_length;
 
 	//			current_cell_x += cell_step_x;
 	//		}
 	//		else if (x_ray_length > y_ray_length)
 	//		{
-	//			ray_length = y_ray_length;
+	//			ray_length += y_ray_length;
 	//			y_ray_length += y_ray_unit_length;
 
 	//			current_cell_y += cell_step_y;
@@ -321,7 +307,7 @@ void Player::UpdateRay()
 	//			//If the rays are equal, that means we hit the corner, so we stretch both rays.
 	//			corner_collision = 1;
 
-	//			ray_length = x_ray_length;
+	//			ray_length += x_ray_length;
 	//			x_ray_length += x_ray_unit_length;
 	//			y_ray_length += y_ray_unit_length;
 
@@ -396,15 +382,32 @@ bool Player::map_collision(float i_x, float i_y)
 	return 0;
 }
 
+void Player::Projection()
+{
+
+	for (unsigned int i = 0; i < m_vecRays.size(); i++)
+	{
+		m_vecRays[i][0].position = info.m_position;
+		if (Intersect(i))
+		{
+
+			m_vecRays[i][1].position = info.m_intersection;
+		}
+		else {
+			m_vecRays[i][1].position = { info.m_position.x + info.m_rayLength * dCos((info.m_angleX + Fov / 2) - i * (Fov / WIDTHSCREEN))
+			,info.m_position.y + info.m_rayLength * dSin((info.m_angleX + Fov / 2) - i * (Fov / WIDTHSCREEN)) };
+		}
+	}
+}
 
 bool Player::Intersect(unsigned int it) {
 	float fAngle = info.m_angleX + Fov / 2 - it * (Fov / WIDTHSCREEN);
 	sf::Vector2f direction = { dCos(fAngle), dSin(fAngle) };
 
-	for (float l = 0; l < info.m_rayLength; l++)
+	for (float l = 0; l < RENDER_DISTANCE; l++)
 	{
-		float dx = info.m_position.x + l * direction.x;
-		float dy = info.m_position.y + l * direction.y;
+		int dx = info.m_position.x + l * direction.x;
+		int dy = info.m_position.y + l * direction.y;
 
 		int mapX = static_cast<int>(dx / blockSize);
 		int mapY = static_cast<int>(dy / blockSize);

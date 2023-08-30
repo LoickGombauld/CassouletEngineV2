@@ -21,6 +21,11 @@ CellType Map::GetCellType(int x, int y)
 	return m_map[x][y].GetCellType();
 }
 
+CellType Map::GetCellType(sf::Vector2f& pos)
+{
+	return m_map[pos.x][pos.y].GetCellType();
+}
+
 bool Map::ContainPoint(int x, int y, sf::Vector2f& point)
 {
 	if (&m_map[x][y].CellBounds() == nullptr)

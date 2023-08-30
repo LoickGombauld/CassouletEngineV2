@@ -35,10 +35,7 @@ struct Math
 	{
 		return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
 	}
-	double static  CalculateDistance(sf::Vector2f a, sf::Vector2i b)
-	{
-		return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
-	}
+
 
 	sf::Vector2f static  CalculateNormal(const sf::Vector2f& vector) {
 		return sf::Vector2f(-vector.y, vector.x);

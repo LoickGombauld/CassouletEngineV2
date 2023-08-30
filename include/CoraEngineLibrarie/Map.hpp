@@ -22,6 +22,7 @@ public:
 	Cell GetCell(int y,int x);
 	std::array<std::array<Cell, yCase>, xCase> GetHandle();
 	CellType GetCellType(int x, int y);
+	CellType GetCellType(sf::Vector2f& pos);
 	bool ContainPoint(int x, int y, sf::Vector2f& point);
 	std::vector<Cell> m_walls;
 	void SpawnPlayerOnMap(Player& player);
