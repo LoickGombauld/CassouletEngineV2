@@ -1,5 +1,6 @@
 #include <CoraEngineLibrarie/Map.hpp>
 #include  <CoraEngineLibrarie/Player.hpp>
+#include  <CoraEngineLibrarie/Entity.hpp>
 
 Map::Map()
 {
@@ -32,12 +33,8 @@ bool Map::ContainPoint(int x, int y, sf::Vector2f& point)
 	{
 		return false;
 	}
-	else
-	{
-		return  m_map[x][y].CellBounds().contains(point);
-	}
+	return  m_map[x][y].CellBounds().contains(point);
 }
-
 
 void Map::GenerateMap()
 {
@@ -71,6 +68,10 @@ void Map::GenerateMap()
 			else
 			{
 				m_map[a][b] = Cell(cellPosition, Empty, box);
+				if (pixel == sf::Color::Blue)
+				{
+					m_EntitySpawner.push_back(m_map[a][b]);
+				}
 			}
 		}
 
@@ -78,6 +79,20 @@ void Map::GenerateMap()
 	}
 	m_image = map_sketch;
 }
+
+Cell Map::GetSpawnerCell(int index)
+{
+	if (index< 0)
+	{
+		index = 0;
+	}
+	else if(index> m_EntitySpawner.size())
+	{
+		index = m_EntitySpawner.size();
+	}
+	return m_EntitySpawner[index];
+}
+
 
 void Map::SetWallTexture(int index, sf::Texture* walltexture)
 {
@@ -93,15 +108,15 @@ void Map::Draw(Window& renderWindow, sf::Texture* walltexture, sf::Texture* floo
 		{
 			auto shape = m_map[a][b].GetShape();
 			switch (m_map[a][b].GetCellType()) {
-			case Empty: 
-			shape.setTexture(floortexture);
-				
+			case Empty:
+				shape.setTexture(floortexture);
+
 				break;
-			case Wall: 
-			shape.setTexture(walltexture);
+			case Wall:
+				shape.setTexture(walltexture);
 				break;
 			case Win:
-				
+
 				break;
 			default:;
 			}
@@ -124,6 +139,7 @@ void Map::SpawnPlayerOnMap(Player& player)
 				player.SetPosition(static_cast<float>(blockSize * a), static_cast<float>(blockSize * b));
 				std::cout << "Player Placed" << std::endl;
 				hasSpawned = true;
+				break;
 			}
 		}
 	}
@@ -132,5 +148,6 @@ void Map::SpawnPlayerOnMap(Player& player)
 		std::cout << "Aucun Spawner n'a été trouvé !";
 	}
 }
+
 
 

@@ -7,38 +7,28 @@
 #include  <CoraEngineLibrarie/Map.hpp>
 #include <CoraEngineLibrarie/TextureManager.hpp>
 
-struct CASSOULET_DLL CameraInfo {
+struct CASSOULET_DLL EntityInfo {
 public:
-	Shape m_camera;
 	sf::Vector2f m_position, m_intersection;
 
 	float m_angleX, m_angleY, m_rayLength;
-	float m_radius;
+
 	float m_speedMove, m_speedAngle;
-	float m_colliderRadius;
 
 	std::array<float, WIDTHSCREEN> view_rays;
-	sf::Clock m_clock;
 };
 class CASSOULET_DLL Player
 {
 protected:
 	Window* m_renderWindow;
-	CameraInfo info;
+	EntityInfo info;
 	std::vector<sf::VertexArray>m_vecRays;
 
 public:
 	Player(Window& window, TextureManager& texture_manager, TextureType type, Map& map);
 	Player(Window& window, TextureManager& WallTextures,TextureManager& FloorTextures, Map& map);
-	void Draw(Window&);
+	void Draw(Window&,Entity& entity);
 	void Update();
-	void Projection();
-	void UpdateKeyboardHit();
-	void UpdateRay();
-	void CheckCollisionWithWalls(sf::Vector2f&);
-	bool Intersect(unsigned int it);
-	bool map_collision(float i_x, float i_y);
-	void SetupPlayer();
 	void SetMap(Map& map);
 	void SetPosition(sf::Vector2f);
 	void SetPosition(float,float);
@@ -52,11 +42,20 @@ public:
 
 private:
 
+	void CheckCollisionWithWalls(sf::Vector2f&);
+	void Projection();
+	void UpdateKeyboardHit();
+	void UpdateRay();
+	bool Intersect(unsigned int it);
+	bool map_collision(float i_x, float i_y);
+	void SetupPlayer();
 	sf::Sprite m_wallSprite;
 	sf::Sprite m_floorSprite;
 	sf::Vector2f previous;
 	TextureManager m_WallTexureManager;
 	TextureManager m_FloorTextureManager;
+	Shape m_camera;
 	Map m_map;
+
 	bool mouseIslocked;
 };

@@ -68,6 +68,11 @@ sf::RenderWindow* Window::GetHandle()
 	return &m_window;
 }
 
+void Window::DrawSprite(sf::Sprite& sprite)
+{
+	m_window.draw(sprite);
+}
+
 sf::Vector2u Window::GetSize()
 {
 	return m_window.getSize();

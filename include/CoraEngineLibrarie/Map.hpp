@@ -11,12 +11,12 @@
 #include <CoraEngineLibrarie/Fonts.hpp>
 
 class CASSOULET_DLL Player;
+class CASSOULET_DLL Entity;
 
 class CASSOULET_DLL Map
 {
 protected:
 	std::array<std::array<Cell, yCase>, xCase> m_map;
-
 public:
 	Map();
 	Cell GetCell(int y,int x);
@@ -24,12 +24,14 @@ public:
 	CellType GetCellType(int x, int y);
 	CellType GetCellType(sf::Vector2f& pos);
 	bool ContainPoint(int x, int y, sf::Vector2f& point);
-	std::vector<Cell> m_walls;
 	void SpawnPlayerOnMap(Player& player);
 	void Draw(Window& renderWindow, sf::Texture* walltexture, sf::Texture* floortexture);
 	void SetWallTexture(int index, sf::Texture* walltexture);
+	Cell GetSpawnerCell(int index);
 private:
 	void GenerateMap();
-	sf::Image m_image;
+	std::vector<Cell> m_walls;
+	std::vector<Cell> m_EntitySpawner;
+ 	sf::Image m_image;
 
 };

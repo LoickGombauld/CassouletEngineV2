@@ -2,6 +2,7 @@
 #include <CoraEngineLibrarie/Window.hpp>
 #include <CoraEngineLibrarie/Global.hpp>
 #include  <CoraEngineLibrarie/Player.hpp>
+#include  <CoraEngineLibrarie/Entity.hpp>
 #include  <CoraEngineLibrarie/TextureManager.hpp>
 
 
@@ -20,11 +21,18 @@ int main()
 	Fonts fonts;
 	TextureManager FloorManager("Floor");
 	TextureManager WallManager("Wall");
+	TextureManager charManager("CharacterSprite");
+
+
 	Map map;
-	Player player(window ,WallManager,FloorManager,map);
-
+	Player player(window, WallManager, FloorManager, map);
+	std::vector<Entity> entities;
+	entities.emplace_back(Entity(*charManager.GetTexture(0), map));
 	map.SpawnPlayerOnMap(player);
-
+	for (auto& entity : entities)
+	{
+		entity.SetOriginPosition(map.GetSpawnerCell(0).GetCellPosition());
+	}
 
 	while (window.isOpen())
 	{
@@ -44,11 +52,18 @@ int main()
 			player.SetMouse(true);
 		}
 		player.Update();
+		for (auto& entity : entities) {
+			entity.Update();
+		}
 		window.Clear(sf::Color::Cyan);
 		mapWindow.Clear();
 
-		map.Draw(mapWindow,WallManager.GetTexture(0),FloorManager.GetTexture(0) );
-		player.Draw(mapWindow);
+		map.Draw(mapWindow, WallManager.GetTexture(0), FloorManager.GetTexture(0));
+		for (auto& entity : entities)
+		{
+			player.Draw(mapWindow, entity);
+			entity.DrawOnMap(mapWindow);
+		}
 
 
 		window.Display();

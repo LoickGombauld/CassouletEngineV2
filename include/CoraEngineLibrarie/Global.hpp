@@ -12,14 +12,12 @@ constexpr unsigned short WIDTHSCREEN = xCase * blockSize,
 
 HEIGHTSCREEN = yCase * blockSize;
 const float RENDER_DISTANCE = 200;
-const float PlayerColliderRadius = 1;
-const unsigned int Radius = 10;
-const float SpeedMove = 5.f;
+const float SpeedMove = 8.f;
 const float SpeedAngle = 5;
 const float repulsionMagnitude = 10;
 const float elasticityCoefficient = 10;
 const float interpolationFactor = 25;
-const float Fov = 90;
+const float FOV = 90;
 
 ;
 
@@ -53,40 +51,6 @@ public:
 	{
 		m_CellType = cell;
 	}
-
-	//bool Cell::Intersects(const sf::Vector2f& start, const sf::Vector2f& end) const
-	//{
-	//	// Vérifier si le rayon commence à l'intérieur ou à l'extérieur du mur
-	//	if (m_shape.getGlobalBounds().contains(start))
-	//	{
-	//		return true; // Le rayon commence ou termine à l'intérieur du mur
-	//	}
-
-	//	// Calculer la direction et la longueur du rayon
-	//	sf::Vector2f rayDir = end - start;
-	//	float rayLength = Math::length(rayDir);
-	//	rayDir /= rayLength; // Normaliser la direction du rayon
-
-	//	// Trouver l'intersection entre le rayon et le mur
-	//	// Vous pouvez utiliser des mathématiques vectorielles pour effectuer cette vérification
-	//	// Si l'intersection est détectée, renvoyer true, sinon renvoyer false
-	//	// Assurez-vous de prendre en compte les dimensions et la position du mur
-
-	//	return false; // Pas d'intersection détectée
-	//}
-
-
-	//void UpdateCellColision(sf::Vector2f& entityPosition)
-	//{
-	//	if (entityPosition.x < m_shape.getGlobalBounds().left)
-	//	{
-	//		entityPosition.x -= m_shape.getGlobalBounds().left;
-	//	}
-	//	if (entityPosition.x < m_shape.getGlobalBounds().top)
-	//	{
-	//		entityPosition.y += m_shape.getGlobalBounds().top;
-	//	}
-	//}
 
 	sf::Vector2f GetCellPosition() const
 	{

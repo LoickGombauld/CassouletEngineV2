@@ -17,6 +17,11 @@ struct Math
 		return lv.x * rv.x + lv.y * rv.y;
 	}
 
+	inline static float rad_to_deg(float i_radians)
+	{
+		return 180 * i_radians / 3.1415f;
+	}
+
 	//Returns length of a given vector
 	inline static  float length(const sf::Vector2f& source)
 	{

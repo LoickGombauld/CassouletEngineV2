@@ -27,6 +27,9 @@ public:
 	void SetMouseCursorVisible(bool isVisible);
 	sf::RenderWindow* GetHandle();
 	sf::Vector2u GetSize();
+	void DrawSprite(sf::Sprite& sprite);
+
+	
 	void SetSize(sf::Vector2u newSize);
 private:
 	sf::RenderWindow m_window;
