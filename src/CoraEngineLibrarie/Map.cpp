@@ -2,6 +2,7 @@
 #include  <CoraEngineLibrarie/Player.hpp>
 #include  <CoraEngineLibrarie/Entity.hpp>
 
+
 Map::Map()
 {
 	GenerateMap();
@@ -62,12 +63,13 @@ void Map::GenerateMap()
 			if (pixel == sf::Color(255, 255, 255))
 			{
 				std::cout << "Wall Placed" << std::endl;
-				m_map[a][b] = Cell(cellPosition, Wall, box);
+				float height = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / HEIGHTMAX));;
+				m_map[a][b] = Cell(cellPosition, Wall, box,height);
 				m_walls.push_back(m_map[a][b]);
 			}
 			else
 			{
-				m_map[a][b] = Cell(cellPosition, Empty, box);
+				m_map[a][b] = Cell(cellPosition, Empty, box,0);
 				if (pixel == sf::Color::Blue)
 				{
 					m_EntitySpawner.push_back(m_map[a][b]);
@@ -99,6 +101,20 @@ void Map::SetWallTexture(int index, sf::Texture* walltexture)
 	m_walls[index].GetShape().setTexture(walltexture);
 }
 
+
+
+bool Map::CheckEntityOnCell(sf::Vector2i& pos , Entity& entity)
+{
+		int x =  entity.GetOriginPosition().x/ blockSize;
+		int y=  entity.GetOriginPosition().y / blockSize;
+
+		if (pos == sf::Vector2i(x,y))
+		{
+			return true;
+		}
+	
+	return false;
+}
 
 void Map::Draw(Window& renderWindow, sf::Texture* walltexture, sf::Texture* floortexture)
 {

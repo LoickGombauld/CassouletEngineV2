@@ -1,14 +1,17 @@
+#include <imgui-SFML.h>
+#include <imgui.h>
 #include <iostream>
 #include <CoraEngineLibrarie/Window.hpp>
 #include <CoraEngineLibrarie/Global.hpp>
-#include  <CoraEngineLibrarie/Player.hpp>
-#include  <CoraEngineLibrarie/Entity.hpp>
-#include  <CoraEngineLibrarie/TextureManager.hpp>
+#include <CoraEngineLibrarie/Player.hpp>
+#include <CoraEngineLibrarie/Entity.hpp>
+#include <CoraEngineLibrarie/TextureManager.hpp>
 
 
 int main()
 {
 	std::cout << "Welcome to Fantasy Zone Get Ready !" << std::endl;
+
 	Window mapWindow(HEIGHTSCREEN, HEIGHTSCREEN, "Map");
 	mapWindow.GetHandle()->setPosition({ mapWindow.GetHandle()->getPosition() / 6 });
 	mapWindow.SetFrameRate(144);
@@ -18,28 +21,31 @@ int main()
 	window.SetVerticalSyncEnable(true);
 	window.SetMouseCursorVisible(false);
 
+
 	Fonts fonts;
 	TextureManager FloorManager("Floor");
 	TextureManager WallManager("Wall");
 	TextureManager charManager("CharacterSprite");
-
-
+	sf::Clock deltaClock;
 	Map map;
 	Player player(window, WallManager, FloorManager, map);
 	std::vector<Entity> entities;
-	entities.emplace_back(Entity(*charManager.GetTexture(0), map));
+	entities.push_back(Entity(*charManager.GetTexture(0), map));
 	map.SpawnPlayerOnMap(player);
 	for (auto& entity : entities)
 	{
 		entity.SetOriginPosition(map.GetSpawnerCell(0).GetCellPosition());
 	}
 
-	while (window.isOpen())
+	bool isOpen = window.isOpen();
+	while (isOpen)
 	{
+
 		sf::IntRect WindowRect(window.GetHandle()->getPosition(), static_cast<sf::Vector2i>(window.GetSize()));
 		sf::Event event;
 		while (window.PollEvent(event))
 		{
+			//ImGui::SFML::ProcessEvent(*window.GetHandle(), event);
 			if (event.type == sf::Event::Closed)
 				window.Close();
 		}
@@ -47,10 +53,11 @@ int main()
 		{
 			player.SetMouse(false);
 		}
-		if (WindowRect.contains(sf::Mouse::getPosition()) & sf::Mouse::isButtonPressed(sf::Mouse::Right))
+		if (WindowRect.contains(sf::Mouse::getPosition()) && sf::Mouse::isButtonPressed(sf::Mouse::Right))
 		{
 			player.SetMouse(true);
 		}
+		//ImGui::SFML::Update(*window.GetHandle(), deltaClock.restart());
 		player.Update();
 		for (auto& entity : entities) {
 			entity.Update();
@@ -64,10 +71,11 @@ int main()
 			player.Draw(mapWindow, entity);
 			entity.DrawOnMap(mapWindow);
 		}
-
-
+		
 		window.Display();
 		mapWindow.Display();
+
+		isOpen = window.isOpen();
 	}
 	return 0;
 };

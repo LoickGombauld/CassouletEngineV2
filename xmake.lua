@@ -1,5 +1,5 @@
 add_rules("mode.debug", "mode.release")
-add_requires("sfml")
+add_requires("sfml","imgui","imgui-sfml")
 
 set_allowedarchs("windows|x64")
 set_warnings("allextra")
@@ -22,7 +22,7 @@ target("CoraEngineLibrarie")
     add_headerfiles("include/CoraEngineLibrarie/*.h", "include/CoraEngineLibrarie/*.hpp", "include/CoraEngineLibrarie/*.inl")
     add_includedirs("include", { public = true })
     add_files("src/CoraEngineLibrarie/*.cpp")
-    add_packages("sfml", {public = true})
+    add_packages("sfml","imgui","imgui-sfml", {public = true})
 
 target("CoraEngineGame")
     set_kind("binary")

@@ -54,12 +54,13 @@ void Player::Draw(Window& mapWindow, Entity& entity)
 		mapWindow.DrawVertex(vec);
 	mapWindow.DrawCircleShape(m_camera);
 
-	float ray_start_x = info.m_position.x + 0.5f * blockSize;
-	float ray_start_y = info.m_position.y + 0.5f * blockSize;
+	float ray_start_x = info.m_position.x + 0.5f / blockSize;
+	float ray_start_y = info.m_position.y + 0.5f/ blockSize;
 	float projection_distance = 0.5f * blockSize / tan(Math::deg_to_rad(0.5f * FOV));
 	float floor_level = round(0.5f * HEIGHTSCREEN * (1 + tan(Math::deg_to_rad(info.m_angleY)) / tan(Math::deg_to_rad(0.5f * FOV))));
 
-	float entity_direction  = Math::get_degrees(Math::rad_to_deg(atan2(ray_start_y - entity.get_center_y(), entity.get_center_x() - ray_start_x))) + info.m_angleX;
+	float entity_direction  = Math::get_degrees(Math::rad_to_deg(atan2(ray_start_y - entity
+.GetOriginPosition().y, entity.GetOriginPosition().y - ray_start_x))) - info.m_angleX;
 	//My man Pythagoras is saving the day once again!
 
 	float entity_distance = Math::CalculateDistance(info.m_position , entity.GetPos());
@@ -70,19 +71,25 @@ void Player::Draw(Window& mapWindow, Entity& entity)
 	floor_shape.setFillColor(sf::Color(36, 54, 0));
 	floor_shape.setPosition(0, floor_level);
 
+	bool raycastEntityHit = false;
+	for (float i = 0; i< m_vecRays.size(); i++)
+	{
+		if (IntersectSprite(i,entity))
+		{
+			raycastEntityHit = true;
+			break;
+		}
+	}
 
 
-	draw_entity = RENDER_DISTANCE >= entity_distance;
+	draw_entity = raycastEntityHit;
 
 	m_renderWindow->DrawRectShape(Shape(floor_shape));
 	for (unsigned short a = 0; a < WIDTHSCREEN; a++)
 	{
 		if (0 == (1 == draw_entity && entity_distance > info.view_rays[a]))
 		{
-
-			entity.Reset();
 			float ray_direction = FOV * (floor(0.5f * WIDTHSCREEN) - a) / (WIDTHSCREEN - 1);
-
 			float ray_projection_position = 0.5f * dTan(ray_direction) / dTan(0.5f * FOV);
 
 			//Current column's position on the screen.
@@ -102,6 +109,10 @@ void Player::Draw(Window& mapWindow, Entity& entity)
 				float ray_end_x = m_vecRays[a][1].position.x;
 				float ray_end_y = m_vecRays[a][1].position.y;
 				float wall_texture_column_x = 0;
+
+				Cell currentCell = m_map.GetCell((int)ray_end_x / blockSize, (int)ray_end_y / blockSize);
+				//std::cout << "position : " << currentCell.GetCellPosition().x << "," << currentCell.GetCellPosition().y <<std::endl;
+				//std::cout << "Ray : " << ray_end_x<< "," <<ray_end_x<< std::endl;
 
 				unsigned char brightness = static_cast<unsigned char>(round(255 * std::max<float>(0, 2 * info.view_rays[a] / info.m_rayLength - 1)));
 
@@ -123,8 +134,8 @@ void Player::Draw(Window& mapWindow, Entity& entity)
 				}
 
 				m_wallSprite.setPosition(current_column, round(floor_level - 0.5f * column_height));
-				m_wallSprite.setTextureRect(sf::IntRect(static_cast<unsigned short>(round(wall_texture_column_x)), 0, 1, blockSize));
-				m_wallSprite.setScale(std::max(1, next_column - current_column), column_height / static_cast<float>(blockSize));
+				m_wallSprite.setTextureRect(sf::IntRect(static_cast<unsigned short>(wall_texture_column_x), 0, 1, blockSize));
+				m_wallSprite.setScale(std::max(1, next_column - current_column), column_height  / static_cast<float>(blockSize));
 
 				m_renderWindow->GetHandle()->draw(m_wallSprite);
 				m_renderWindow->GetHandle()->draw(shape);
@@ -133,16 +144,15 @@ void Player::Draw(Window& mapWindow, Entity& entity)
 	}
 	if (1 == draw_entity)
 	{
-		float entity_projection_position = 0.5f * dTan(entity_direction) / dTan(0.5f * FOV);
 
-		short entity_screen_x = static_cast<short>(round(WIDTHSCREEN * (0.5f - entity_projection_position)));
+		short entity_screen_x = static_cast<unsigned short>(round(0.5f * entity.GetOriginSize().x));
 
 		unsigned short entity_size = static_cast<unsigned short>(HEIGHTSCREEN * projection_distance/ (entity_distance * dCos(entity_direction)));
 
 		previous_column = SHRT_MIN;
 
 		entity.GetSprite().setColor(sf::Color(255, 255, 255, static_cast<unsigned char>(round(255 * std::min<float>(1, 2 * (1 - entity_distance / RENDER_DISTANCE))))));
-		entity.SetPosition(round( entity_screen_x - 0.5f * entity_size),round( floor_level - 0.5f * entity_size));
+		entity.SetPosition(entity_screen_x - 0.5f * entity_size,floor_level - 0.5f * entity_size);
 		entity.SetScale(sf::Vector2f( entity_size / static_cast<float>(blockSize), entity_size / static_cast<float>(blockSize)));
 		m_renderWindow->GetHandle()->draw(entity.GetSprite());
 		for (unsigned short a = 0; a < WIDTHSCREEN; a++)
@@ -170,7 +180,7 @@ void Player::Draw(Window& mapWindow, Entity& entity)
 					float ray_end_x = m_vecRays[a][1].position.x;
 					float ray_end_y = m_vecRays[a][1].position.y;
 					float wall_texture_column_x = 0;
-
+					Cell currentCell = m_map.GetCell((int)ray_end_x / blockSize, (int)ray_end_y / blockSize);
 					unsigned char brightness = static_cast<unsigned char>(round(255 * std::max<float>(0, 2 * info.view_rays[a] / info.m_rayLength - 1)));
 
 					unsigned short column_height = static_cast<unsigned short>(HEIGHTSCREEN * projection_distance / (info.view_rays[a] * dCos(ray_direction)));
@@ -279,9 +289,6 @@ void Player::UpdateRay()
 	{
 		sf::Vector2f pos0 = m_vecRays[a][0].position;
 		sf::Vector2f pos1 = m_vecRays[a][1].position;
-
-		pos0 = Math::CalculateNormal(pos0);
-		pos1 = Math::CalculateNormal(pos1);
 		float ray_length = Math::CalculateDistance(pos0, pos1);
 		info.view_rays[a] = ray_length;
 	}
@@ -463,6 +470,34 @@ void Player::Projection()
 			,info.m_position.y + info.m_rayLength * dSin((info.m_angleX + FOV / 2) - i * (FOV / WIDTHSCREEN)) };
 		}
 	}
+}
+
+bool Player::IntersectSprite(int it,Entity& entity)
+{
+	float fAngle = info.m_angleX + FOV / 2 - it * (FOV / WIDTHSCREEN);
+	sf::Vector2f direction = { dCos(fAngle), dSin(fAngle) };
+	for (float l = 0; l < RENDER_DISTANCE; l++)
+	{
+		int dx = info.m_position.x + l * direction.x;
+		int dy = info.m_position.y + l * direction.y;
+
+		int mapX = (dx / blockSize);
+		int mapY = (dy / blockSize);
+
+		if (mapX >= 0 && mapX < xCase && mapY >= 0 && mapY < yCase)
+		{
+			if (m_map.CheckEntityOnCell(sf::Vector2i(mapX, mapY),entity) && m_map.GetCellType(mapX,mapY) != Wall)
+			{
+				return true;
+			}
+		}
+		else
+		{
+			// Sortir du raycasting si les coordonnées sortent des limites de la carte
+			break;
+		}
+	}
+	return false;
 }
 
 bool Player::Intersect(unsigned int it) {

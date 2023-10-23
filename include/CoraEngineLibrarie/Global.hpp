@@ -8,11 +8,11 @@
 const float PI = 3.1415f;
 const unsigned int xCase = 19, yCase = 19;
 const unsigned char blockSize = 32;
+const float HEIGHTMAX = 10;
 constexpr unsigned short WIDTHSCREEN = xCase * blockSize,
-
 HEIGHTSCREEN = yCase * blockSize;
 const float RENDER_DISTANCE = 200;
-const float SpeedMove = 8.f;
+const float SpeedMove = 25.f;
 const float SpeedAngle = 5;
 const float repulsionMagnitude = 10;
 const float elasticityCoefficient = 10;
@@ -32,11 +32,16 @@ class CASSOULET_DLL Cell {
 
 public:
 	Cell() {}
-	Cell(sf::Vector2f& cellposition, CellType cellType, sf::RectangleShape& m_shape) :m_shape(m_shape), m_CellPosition(cellposition), m_CellType(cellType) {}
+	Cell(sf::Vector2f& cellposition, CellType cellType, sf::RectangleShape& m_shape,float height) : m_height(height),m_shape(m_shape), m_CellPosition(cellposition), m_CellType(cellType) {}
 
 	void SetPos(sf::Vector2f& position)
 	{
 		m_CellPosition = position;
+	}
+
+	float GetCellHeight()
+	{
+		return m_height;
 	}
 
 	Cell(CellType celltype ):
@@ -90,6 +95,7 @@ private:
 	sf::Vector2f m_CellPosition;
 	CellType m_CellType = Empty;
 	sf::RectangleShape m_shape;
+	float m_height;
 };
 
 #define VARIABLES_HPP_INCLUDED

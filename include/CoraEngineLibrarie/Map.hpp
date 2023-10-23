@@ -27,6 +27,8 @@ public:
 	void SpawnPlayerOnMap(Player& player);
 	void Draw(Window& renderWindow, sf::Texture* walltexture, sf::Texture* floortexture);
 	void SetWallTexture(int index, sf::Texture* walltexture);
+	bool CheckEntityOnCell(sf::Vector2i& pos, Entity& entity);
+
 	Cell GetSpawnerCell(int index);
 private:
 	void GenerateMap();

@@ -52,6 +52,14 @@ void Entity::SetOriginPosition(float i_x, float i_y)
 {
 	m_originPos = { i_x,i_y };
 }
+sf::Vector2f Entity::GetOriginPosition()
+{
+	return m_originPos;
+}
+sf::Vector2f Entity::GetOriginSize()
+{
+	return m_originSize;
+}
 void Entity::SetOriginPosition(sf::Vector2f pos)
 {
 	m_originPos = pos;
@@ -109,15 +117,24 @@ sf::Sprite Entity::GetSprite()
 	return m_entitySprite;
 }
 
+sf::Vector2f Entity::GetSize()
+{
+	return m_entitySprite.getScale();
+}
+
 void Entity::SetScale(sf::Vector2f& scale)
 {
 	m_entitySprite.setScale(scale);
 }
 
-void Entity::Reset()
+void Entity::ResetSize()
 {
-	if (info.m_position != m_originPos)
-	info.m_position = m_originPos;
 	if (m_entitySprite.getScale() != m_originSize)
 		m_entitySprite.setScale(m_originSize);
 }
+void Entity::ResetPos()
+{
+	if (info.m_position != m_originPos)
+		info.m_position = m_originPos;
+}
+

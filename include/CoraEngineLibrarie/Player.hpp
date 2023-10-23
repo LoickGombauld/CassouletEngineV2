@@ -39,11 +39,13 @@ public:
 	inline float dCos(float degree) { return cos(toRadian( degree)); }
 	inline float dSin(float degree) { return sin(toRadian( degree)); }
 	inline float dTan(float degree) { return tan(toRadian( degree)); }
+	float test = 1;
 
 private:
 
 	void CheckCollisionWithWalls(sf::Vector2f&);
 	void Projection();
+	bool IntersectSprite(int it,Entity&);
 	void UpdateKeyboardHit();
 	void UpdateRay();
 	bool Intersect(unsigned int it);

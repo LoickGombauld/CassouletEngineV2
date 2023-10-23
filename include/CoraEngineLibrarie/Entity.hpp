@@ -17,13 +17,16 @@ public:
 	void DrawOnMap(Window& i_window);
 	void SetPosition(float i_x, float i_y);
 	void SetOriginPosition(float i_x, float i_y);
+	sf::Vector2f GetOriginPosition();
+	sf::Vector2f GetOriginSize();
 	void SetOriginPosition(sf::Vector2f pos);
 	void Update();
 	void CheckCollisionWithWalls(sf::Vector2f& movement);
 	void SetScale(sf::Vector2f& scale);
-	void Reset();
+	void ResetSize();
+	void ResetPos();
 	sf::Sprite GetSprite();
-
+	sf::Vector2f GetSize();
 
 private:
 	bool map_collision(float i_x, float i_y);
