@@ -3,8 +3,6 @@
 #include <SFML/Graphics.hpp>
 #include <filesystem>
 
-enum CASSOULET_DLL TextureType { WallTexture, FloorTexture };
-
 
 class CASSOULET_DLL TextureManager
 {

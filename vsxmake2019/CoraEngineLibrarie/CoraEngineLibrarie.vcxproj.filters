@@ -24,7 +24,6 @@ xmake version 2.8.1+dev.732d60063
     <Filter Include="src\CoraEngineLibrarie">
       <UniqueIdentifier>{947FCB62-919F-40A8-A608-ADFAC3404946}</UniqueIdentifier>
     </Filter>
-
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildProjectDirectory)\Xmake.Custom.props">
@@ -39,84 +38,38 @@ xmake version 2.8.1+dev.732d60063
     <None Include="$(MSBuildProjectDirectory)\Xmake.Custom.items.filters">
       <Filter>Properties</Filter>
     </None>
-    <None Include="$(XmakeScriptDir)\xmake.lua">
-      <Filter>Properties</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Entity.hpp">
+    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Constant.h">
       <Filter>include\CoraEngineLibrarie</Filter>
     </ClInclude>
     <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Export.hpp">
       <Filter>include\CoraEngineLibrarie</Filter>
     </ClInclude>
-    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Fonts.hpp">
-      <Filter>include\CoraEngineLibrarie</Filter>
-    </ClInclude>
-    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Global.hpp">
-      <Filter>include\CoraEngineLibrarie</Filter>
-    </ClInclude>
-    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Map.hpp">
-      <Filter>include\CoraEngineLibrarie</Filter>
-    </ClInclude>
-    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Math.hpp">
-      <Filter>include\CoraEngineLibrarie</Filter>
-    </ClInclude>
-    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Player.hpp">
-      <Filter>include\CoraEngineLibrarie</Filter>
-    </ClInclude>
-    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Shape.hpp">
+    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Player.h">
       <Filter>include\CoraEngineLibrarie</Filter>
     </ClInclude>
     <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\TextureManager.hpp">
       <Filter>include\CoraEngineLibrarie</Filter>
     </ClInclude>
-    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Window.hpp">
+    <ClInclude Include="..\..\include\CoraEngineLibrarie\MapManager.hpp">
       <Filter>include\CoraEngineLibrarie</Filter>
     </ClInclude>
-
-
   </ItemGroup>
   <ItemGroup>
-
-    <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\Entity.cpp">
-      <Filter>src\CoraEngineLibrarie</Filter>
-    </ClCompile>
-    <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\Fonts.cpp">
-      <Filter>src\CoraEngineLibrarie</Filter>
-    </ClCompile>
-    <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\Map.cpp">
-      <Filter>src\CoraEngineLibrarie</Filter>
-    </ClCompile>
-    <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\MapCollision.cpp">
-      <Filter>src\CoraEngineLibrarie</Filter>
-    </ClCompile>
     <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\Player.cpp">
-      <Filter>src\CoraEngineLibrarie</Filter>
-    </ClCompile>
-    <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\SFMLPP.cpp">
-      <Filter>src\CoraEngineLibrarie</Filter>
-    </ClCompile>
-    <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\Shape.cpp">
       <Filter>src\CoraEngineLibrarie</Filter>
     </ClCompile>
     <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\TextureManager.cpp">
       <Filter>src\CoraEngineLibrarie</Filter>
     </ClCompile>
-    <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\Window.cpp">
+    <ClCompile Include="..\..\src\CoraEngineLibrarie\MapManager.cpp">
       <Filter>src\CoraEngineLibrarie</Filter>
     </ClCompile>
-
-
-
   </ItemGroup>
   <ItemGroup>
-
   </ItemGroup>
   <ItemGroup>
-
-
   </ItemGroup>
-  <Import Condition="Exists('$(MSBuildThisFileDirectory)\Xmake.Custom.files.filters')"
-    Project="$(MSBuildThisFileDirectory)\Xmake.Custom.files.filters" />
+  <Import Condition="Exists('$(MSBuildThisFileDirectory)\Xmake.Custom.files.filters')" Project="$(MSBuildThisFileDirectory)\Xmake.Custom.files.filters" />
 </Project>
