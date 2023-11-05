@@ -5,22 +5,25 @@
 #include <CoraEngineLibrarie/MapManager.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
+#include <SFML/GpuPreference.hpp>
 #include <CoraEngineLibrarie/Player.h>
 #include <CoraEngineLibrarie/Constant.h>
 #include <CoraEngineLibrarie/Map.h>
-//#include <CoraEngineLibrarie/Cell.h>
 
+SFML_DEFINE_DISCRETE_GPU_PREFERENCE
 bool isCollision(int x, int y, int nb_case_w, int nb_case_h, Map& m_map);
 void UpdatePhysic(sf::Vector2f& movement, int mapSizeX, int mapSizeY, Map& map);
 sf::RectangleShape generate_map(int x, int y, int nb_case_w, int nb_case_h);
 void line_view(sf::RenderWindow& windows, float nb_dec);
 
 Player player;
+
+
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(width, height), "CoraEngine 1.2");
 	std::cout << "Welcome to Fantasy Zone Get Ready !" << std::endl;
-	TextureManager::Init("Resources");
+	TextureManager::Init();
 	MapManager mapManager("Level");
 	sf::Image mapImage(*mapManager.GetLevel(0));
 	int mapSizeX = mapImage.getSize().x;
@@ -34,7 +37,6 @@ int main()
 	player.SetPosition(map.playerStarter.x, map.playerStarter.y);
 	while (window.isOpen())
 	{
-		std::cout << activeMouse << std::endl;
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
@@ -43,7 +45,6 @@ int main()
 			if (event.type == sf::Event::Resized)
 				windowRect = sf::IntRect(window.getPosition(), sf::Vector2i(window.getSize()));
 		}
-
 		window.clear(sf::Color::Blue);
 		player.UpdatePostion();
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
@@ -80,25 +81,24 @@ int main()
 					movement.x += dCos(player.angleX + 90) * vitesse;
 					movement.y += dSin(player.angleX + 90) * vitesse;
 				}
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-					if (isCollision(player.Posx + cos(player.angleX * PI / 180) * vitesse, player.Posy - sin(player.angleX * PI / 180) * vitesse, mapSizeX, mapSizeY, map)) {
-						movement.x += dCos(player.angleX) * vitesse;
-						movement.y -= dSin(player.angleX) * vitesse;
-					}
-				}
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-					if (isCollision(player.Posx - cos(player.angleX * PI / 180) * vitesse, player.Posy + sin(player.angleX * PI / 180) * vitesse, mapSizeX, mapSizeY, map)) {
-						movement.x -= dCos(player.angleX) * vitesse;
-						movement.y += dSin(player.angleX) * vitesse;
-					}
-				}
-				UpdatePhysic(movement, mapSizeX, mapSizeY, map);
-
+				//if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+				//	if (isCollision(player.Posx + cos(player.angleX * PI / 180) * vitesse, player.Posy - sin(player.angleX * PI / 180) * vitesse, mapSizeX, mapSizeY, map)) {
+				//		movement.x += dCos(player.angleX) * vitesse;
+				//		movement.y -= dSin(player.angleX) * vitesse;
+				//	}
+				//}
+				//if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+				//	if (isCollision(player.Posx - cos(player.angleX * PI / 180) * vitesse, player.Posy + sin(player.angleX * PI / 180) * vitesse, mapSizeX, mapSizeY, map)) {
+				//		movement.x -= dCos(player.angleX) * vitesse;
+				//		movement.y += dSin(player.angleX) * vitesse;
+				//	}
+				//}
+				//UpdatePhysic(movement, mapSizeX, mapSizeY, map);
 			}
 		}
 
 		//Minimap
-		map.Draw(window);
+		//map.Draw(window);
 		window.draw(player.body);
 		window.display();
 	}

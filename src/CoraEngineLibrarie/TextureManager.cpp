@@ -4,15 +4,21 @@
 std::unordered_map<std::string, sf::Texture> TextureManager::textureIds;
 
 
-void TextureManager::Init(std::string filePath)
+void TextureManager::LoadTexturesFolders(std::string filePath)
 {
-	for (const auto& entry : std::filesystem::directory_iterator(filePath)) {
+	for (const auto& entry : std::filesystem::directory_iterator("Resources/"+ filePath)) {
 
 		sf::Texture sfmliD;
 		sfmliD.loadFromFile(entry.path().string());
 		//Debug::Log(entry.path().filename().string() + " was added ");
 		textureIds.insert(std::pair(entry.path().filename().string(), sfmliD));
 	}
+}
+
+void TextureManager::Init()
+{
+	LoadTexturesFolders("CharacterSprite");
+	LoadTexturesFolders("Tiles");
 }
 
 sf::Texture* TextureManager::GetTexture(std::string name)
