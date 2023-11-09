@@ -1,20 +1,99 @@
 #pragma once
-#define PI 3.14159265
-const int width = 600;
-const int height = 600;
-const float rayon = 5;
-const int vitesse = 1; // Speed player
-const int v_angle = 10; // Speed angle
-const int angle_vision = 64; // FOV
-const int precision_angle = 3; //equals to number of values in 1 degre
+#include <mutex>
+#include <SFML/Graphics.hpp>
+namespace gbl
+{
+	struct SpriteData
+	{
+		unsigned short total_frames;
 
-const unsigned int sizemaxX = 32, sizemaxY = 32;
+		int index;
 
-const int fps = 144;
+		std::string image_location;
+		std::string name;
 
-const float rate_map = 5;
+		sf::Rect<unsigned short> texture_box;
 
-inline float toRadian(float degree) { return (PI / 180) * degree; }
-inline float dCos(float degree) { return cos(toRadian(degree)); }
-inline float dSin(float degree) { return sin(toRadian(degree)); }
-inline float dTan(float degree) { return tan(toRadian(degree)); }
+		sf::Sprite* sprite;
+
+		sf::Vector2<short> origin;
+	};
+
+	namespace MAP
+	{
+		constexpr unsigned char CELL_SIZE = 2;
+		constexpr unsigned char COLUMNS = 64;
+		constexpr unsigned char ROWS = 64;
+
+		//This cell is used for the map.
+		enum class Cell
+		{
+			Empty,
+			Wall
+		};
+
+		//This cell is used for pathfinding.
+		enum class PathCell
+		{
+			Empty,
+			Invalid,
+			Visited,
+			Wall
+		};
+
+		template <typename value_type = Cell>
+		using Map = std::array<std::array<value_type, ROWS>, COLUMNS>;
+	}
+
+	namespace PLAYER
+	{
+		constexpr float MOVEMENT_SPEED =10;
+	}
+
+	namespace RAYCASTING
+	{
+		constexpr float FOV_HORIZONTAL = 90;
+		constexpr float FOV_VERTICAL = 90;
+		constexpr float MAX_VERTICAL_DIRECTION = 60;
+		//Can someone give me the closest value of PI we can store in a float?
+		constexpr float PI = 3.141592653589793116f;
+		constexpr float RENDER_DISTANCE = 8;
+	}
+
+	namespace SCREEN
+	{
+		constexpr unsigned char RESIZE = 2;
+
+		constexpr unsigned short HEIGHT = 360;
+		constexpr unsigned short WIDTH = 640;
+
+		//60 fps now
+		constexpr std::chrono::microseconds FRAME_DURATION(33334);
+	}
+
+	namespace SPRITES
+	{
+		constexpr float FIRE_ANIMATION_SPEED = 0.5f;
+		constexpr float HAND_BOBBING_SPEED = 0.0625f;
+		constexpr float HAND_SCALE = 3;
+
+		constexpr unsigned short HAND_OFFSET_MAX = 32;
+	}
+
+	namespace NPC
+	{
+		constexpr float MAX_MOVEMENT_DISTANCE = 32;
+		constexpr float MAX_MOVEMENT_SPEED = 0.10f;
+		constexpr float MIN_MOVEMENT_DISTANCE = 4;
+		constexpr float MIN_MOVEMENT_SPEED = 0.025f;
+
+		constexpr short SCREAMER_Y = -64;
+
+		constexpr unsigned char SCREAMER_RESIZE = 16;
+
+		constexpr unsigned short SCREAMER_MAX_OFFSET = 32;
+	}
+
+	template <typename value_type = unsigned short>
+	using Position = std::pair<value_type, value_type>;
+}

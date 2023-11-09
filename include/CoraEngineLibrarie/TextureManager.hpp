@@ -10,10 +10,10 @@ class CASSOULET_DLL TextureManager
 public:
 	//add a new texture
 	static void Init();
-	static sf::Texture* TextureManager::GetTexture(std::string name);
+	static sf::Texture* TextureManager::GetTexture(const std::string& name);
 
 private:
 	//list of loaded textures
-	static void LoadTexturesFolders(std::string path);
+	static void LoadTexturesFolders(const std::string& path);
 	static std::unordered_map<std::string, sf::Texture> textureIds;
 };

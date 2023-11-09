@@ -4,11 +4,7 @@
 
 MapManager::MapManager()
 {
-}
-
-MapManager::MapManager(std::string filePath)
-{
-    for (const auto& entry : std::filesystem::directory_iterator("Resources/" + filePath)) {
+    for (const auto& entry : std::filesystem::directory_iterator("Resources/Levels")) {
         sf::Image map;
         map.loadFromFile(entry.path().string());
         m_maps.push_back(map);

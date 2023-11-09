@@ -2,17 +2,21 @@
 #include <SFML/Graphics.hpp>
 #include <CoraEngineLibrarie/Export.hpp>
 #include <CoraEngineLibrarie/Constant.h>
+
 class CASSOULET_DLL Player {
-private:
+	sf::Vector2f direction;
+	sf::Vector2f veloctity;
+	sf::Vector2f position;
+    float MaxSpeed;
+	float Acceleration;
+	float Deceleration;
+	float speed;
 public:
-	sf::CircleShape	 body;
-	Player();
-	void SetPosition(float x, float y);
-	float angleX = 0;
-	float angleY = 0;
-	float Posx = 150;
-	float Posy = 150;
+	Player(const float i_x = 0, const float i_y = 0);
 
-	void UpdatePostion();
+	void set_position(const float i_x, const float i_y);
+	void update(const sf::RenderWindow& i_window, const gbl::MAP::Map<>& i_map);
 
+	sf::Vector2f get_direction() const;
+	sf::Vector2f get_position() const;
 };
