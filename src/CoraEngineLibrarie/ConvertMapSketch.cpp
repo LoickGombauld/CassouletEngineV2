@@ -5,7 +5,7 @@
 //Someday I'll use "Tiled Map Editor".
 //But not today.
 gbl::MAP::Map<> convert_map_sketch(sf::Image& map_sketch, entt::entity& i_playerEntity, entt::registry& registry,
-	SpriteManager& i_sprite_manager, gbl::NPC::NpcData soldier)
+	SpriteManager& i_sprite_manager, const  gbl::NPC::NpcData& soldier)
 {
 	auto& i_player = registry.get<gbl::Transform>(i_playerEntity);
 	gbl::MAP::Map<> output_map{};
@@ -18,27 +18,32 @@ gbl::MAP::Map<> convert_map_sketch(sf::Image& map_sketch, entt::entity& i_player
 			if (pixel != sf::Color::White && pixel != sf::Color(255, 0, 0))
 			{
 				const auto entity = registry.create();
-				registry.emplace<gbl::Transform>(entity, sf::Vector2f( 0, 0), sf::Vector2f(a, b));
+				registry.emplace<gbl::Transform>(entity, sf::Vector2f(0, 0), sf::Vector2f(a, b));
 				registry.emplace<gbl::SpriteData>(entity);
 				registry.emplace<gbl::Animation>(entity);
 				if (pixel == sf::Color(0, 0, 255))
 				{
-				auto npc = registry.emplace<gbl::NPC::NpcData>(entity);
-				npc = soldier;
-				registry.emplace<gbl::IA::Astar>(entity);
+					registry.emplace<gbl::NPC::NpcData>(entity,soldier);
+					registry.emplace<gbl::IA::Astar>(entity);
 				}
 				else if (pixel == sf::Color(182, 0, 0))
 				{
-					registry.emplace<gbl::PropData>(entity, 0, "BARREL", i_sprite_manager, a, b);
+					registry.emplace<gbl::PropData>(entity);
+					auto prop = registry.get<gbl::PropData>(entity);
+					prop.is_animation = 0;
+					prop.name = "BARREL";
 				}
 				else if (pixel == sf::Color(255, 146, 0))
 				{
-					registry.emplace<gbl::PropData>(entity, 1, "FIRE_CAULDRON", i_sprite_manager, a, b);
+					registry.emplace<gbl::PropData>(entity);
+					auto prop = registry.get<gbl::PropData>(entity);
+					prop.is_animation = 1;
+					prop.name = "FIRE_CAULDRON";
 				}
 			}
 			else if (pixel == sf::Color(255, 0, 0))
 			{
-				i_player.position = sf::Vector2f( a, b );
+				i_player.position = sf::Vector2f(a, b);
 			}
 			else if (pixel == sf::Color::White)
 			{

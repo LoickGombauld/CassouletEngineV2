@@ -34,11 +34,7 @@ public:
 
 	int Game::get_width(SpriteManager& sprite_manager, float distance, std::string name) const;
 
-	void Game::DrawAnimation(const sf::Vector2<short>& i_position,
-		sf::RenderWindow& i_window, const gbl::SpriteData& sprite_data, const gbl::Animation& animation, const bool i_mirror_horizontal = 0,
-		const bool i_mirror_vertical = 0, const float i_scale_x = 1,
-		const float i_scale_y = 1, const sf::Color& i_color = sf::Color(255, 255, 255),
-		const sf::Rect<unsigned short>& i_texture_box = sf::Rect<unsigned short>(0, 0, USHRT_MAX, USHRT_MAX))const ;
+	void Game::DrawAnimation(const sf::Vector2<short>& i_position, sf::RenderWindow& i_window, gbl::SpriteData& sprite_data, gbl::Animation& animation, const bool i_mirror_horizontal = 0, const bool i_mirror_vertical = 0, const float i_scale_x = 1, const float i_scale_y = 1, const sf::Color& i_color = sf::Color(255, 255, 255), const sf::Rect<unsigned short>& i_texture_box = sf::Rect<unsigned short>(0, 0, USHRT_MAX, USHRT_MAX))const ;
 	MapManager managerMap;
 
 	SpriteManager sprite_manager;

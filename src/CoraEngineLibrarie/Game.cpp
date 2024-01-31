@@ -13,13 +13,41 @@ Game* Game::I()
 	return i;
 }
 
+Game::Game(entt::registry& registry) :
+	show_map(1),
+	hand_offset(-0.5f),
+	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "CoraEngine 1.3 (Ont fait du neuf avec du vieux) ", sf::Style::Close),
+	fov_visualization(sf::TriangleFan, 1 + gbl::SCREEN::WIDTH),
+	weapon_manager(sprite_manager),
+	npc_manager(sprite_manager)
+{
+	i = this;
+	playerEntity = CreatePlayer(registry, sf::Vector2f (0, 0 ));
+	window.setMouseCursorVisible(0);
+	window.setView(sf::View(sf::FloatRect(0, 0, gbl::SCREEN::WIDTH, gbl::SCREEN::HEIGHT)));
+	window.setFramerateLimit(gbl::SCREEN::FPSMax);
+	map = convert_map_sketch(*managerMap.GetLevel(0), playerEntity, registry, sprite_manager,
+		Game::I()->GetNpcData()->get_Npc_data("SOLDIER"));
+	auto view = registry.view<gbl::NPC::NpcData>();
+	for (auto entity : view) {
+		fill_map(map,registry,entity);
+	}
+	for (Stripe& stripe : stripes)
+	{
+		stripe.set_sprite_manager(sprite_manager);
+	}
+}
+
 
 entt::entity CreatePlayer(entt::registry& registry, sf::Vector2f& position) {
 	entt::entity entity = registry.create();
 	registry.emplace<gbl::Transform>(entity);
-	auto playerdata = registry.emplace<gbl::PLAYER::PlayerData>(entity);
-	auto playerAnimation = registry.emplace<gbl::Animation>(entity);
-	auto weapon = registry.emplace < gbl::WEAPON::WeaponData > (entity);
+	registry.emplace<gbl::PLAYER::PlayerData>(entity);
+	auto playerdata = registry.get<gbl::PLAYER::PlayerData>(entity);
+	registry.emplace<gbl::Animation>(entity);
+	auto playerAnimation = registry.get<gbl::Animation>(entity);
+	registry.emplace <gbl::WEAPON::WeaponData> (entity);
+	auto weapon = registry.get <gbl::WEAPON::WeaponData > (entity);
 	playerAnimation.animation_speed = gbl::SPRITES::FIRE_ANIMATION_SPEED;
 	playerAnimation.ping_pong = 0;
 	weapon.name = "WEAPON_2";
@@ -36,11 +64,7 @@ int  Game::get_width(SpriteManager& sprite_manager,float distance,std::string na
 	return round(gbl::SCREEN::HEIGHT * sprite_width / (distance * sprite_height * tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL))));
 }
 
-void Game::DrawAnimation(const sf::Vector2<short>& i_position,
-	sf::RenderWindow& i_window,const gbl::SpriteData& sprite_data,const gbl::Animation& animation, const bool i_mirror_horizontal = 0,
-	const bool i_mirror_vertical = 0, const float i_scale_x = 1,
-	const float i_scale_y = 1, const sf::Color& i_color = sf::Color(255, 255, 255),
-	const sf::Rect<unsigned short>& i_texture_box = sf::Rect<unsigned short>(0, 0, USHRT_MAX, USHRT_MAX)) const
+void Game::DrawAnimation(const sf::Vector2<short>& i_position, sf::RenderWindow& i_window, gbl::SpriteData& sprite_data, gbl::Animation& animation, const bool i_mirror_horizontal, const bool i_mirror_vertical, const float i_scale_x, const float i_scale_y, const sf::Color& i_color, const sf::Rect<unsigned short>& i_texture_box)const
 {
 	unsigned short frame = floor(animation.current_frame);
 
@@ -357,38 +381,12 @@ void DrawProp(entt::registry& registry, entt::entity& prop, Game* game, const sh
 		}
 		else
 		{
-			game->DrawAnimation(sf::Vector2<short>(propTransform.position.x, i_pitch + propTransform.position.y),
-				i_window,propSpriteData, propAnimation, 0, 0, Game::I()->get_width(game->sprite_manager, propData.distance,propData.name) / sprite_width, propData.get_height() / sprite_height,
+			game->DrawAnimation(sf::Vector2<short>(propTransform.position.x, i_pitch + propTransform.position.y),i_window,propSpriteData, propAnimation, 0, 0, Game::I()->get_width(game->sprite_manager, propData.distance,propData.name) / sprite_width, propData.get_height() / sprite_height,
 				sf::Color(shade, shade, shade));
 		}
 	}
 }
 
-
-Game::Game(entt::registry& registry) :
-	show_map(1),
-	hand_offset(-0.5f),
-	window(sf::VideoMode(gbl::SCREEN::RESIZE* gbl::SCREEN::WIDTH, gbl::SCREEN::RESIZE* gbl::SCREEN::HEIGHT), "CoraEngine 1.3 (Ont fait du neuf avec du vieux) ", sf::Style::Close),
-	fov_visualization(sf::TriangleFan, 1 + gbl::SCREEN::WIDTH),
-	weapon_manager(sprite_manager),
-	npc_manager(sprite_manager)
-{
-	i = this;
-	playerEntity = CreatePlayer(registry, sf::Vector2f{ 0, 0 });
-	window.setMouseCursorVisible(0);
-	window.setView(sf::View(sf::FloatRect(0, 0, gbl::SCREEN::WIDTH, gbl::SCREEN::HEIGHT)));
-	window.setFramerateLimit(gbl::SCREEN::FPSMax);
-	map = convert_map_sketch(*managerMap.GetLevel(0), playerEntity, registry, sprite_manager,
-		Game::I()->GetNpcData()->get_Npc_data("SOLDIER"));
-	auto view = registry.view<gbl::NPC::NpcData>();
-	for (auto entity : view) {
-		fill_map(map,registry,entity);
-	}
-	for (Stripe& stripe : stripes)
-	{
-		stripe.set_sprite_manager(sprite_manager);
-	}
-}
 
 
 void Game::GameOver()
