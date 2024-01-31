@@ -24,6 +24,7 @@ xmake version 2.8.1+dev.732d60063
     <Filter Include="src\CoraEngineLibrarie">
       <UniqueIdentifier>{947FCB62-919F-40A8-A608-ADFAC3404946}</UniqueIdentifier>
     </Filter>
+
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildProjectDirectory)\Xmake.Custom.props">
@@ -38,12 +39,12 @@ xmake version 2.8.1+dev.732d60063
     <None Include="$(MSBuildProjectDirectory)\Xmake.Custom.items.filters">
       <Filter>Properties</Filter>
     </None>
+    <None Include="$(XmakeScriptDir)\xmake.lua">
+      <Filter>Properties</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\AngleFunctions.h">
-      <Filter>include\CoraEngineLibrarie</Filter>
-    </ClInclude>
-    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Animation.h">
       <Filter>include\CoraEngineLibrarie</Filter>
     </ClInclude>
     <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Astar.h">
@@ -58,6 +59,9 @@ xmake version 2.8.1+dev.732d60063
     <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\ConvertMapSketch.h">
       <Filter>include\CoraEngineLibrarie</Filter>
     </ClInclude>
+    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Events.h">
+      <Filter>include\CoraEngineLibrarie</Filter>
+    </ClInclude>
     <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Export.hpp">
       <Filter>include\CoraEngineLibrarie</Filter>
     </ClInclude>
@@ -67,22 +71,25 @@ xmake version 2.8.1+dev.732d60063
     <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\GetAdjacentCells.h">
       <Filter>include\CoraEngineLibrarie</Filter>
     </ClInclude>
+    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\GetCell.h">
+      <Filter>include\CoraEngineLibrarie</Filter>
+    </ClInclude>
     <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\MapCollision.h">
       <Filter>include\CoraEngineLibrarie</Filter>
     </ClInclude>
     <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\MapManager.hpp">
       <Filter>include\CoraEngineLibrarie</Filter>
     </ClInclude>
-    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Npc.h">
+    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\NpcManager.hpp">
       <Filter>include\CoraEngineLibrarie</Filter>
     </ClInclude>
-    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Player.h">
+    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Raycast.h">
       <Filter>include\CoraEngineLibrarie</Filter>
     </ClInclude>
-    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Prop.h">
+    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\SoundManager.hpp">
       <Filter>include\CoraEngineLibrarie</Filter>
     </ClInclude>
-    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\SpriteManager.h">
+    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\SpriteManager.hpp">
       <Filter>include\CoraEngineLibrarie</Filter>
     </ClInclude>
     <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\Stripe.h">
@@ -91,15 +98,30 @@ xmake version 2.8.1+dev.732d60063
     <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\TextureManager.hpp">
       <Filter>include\CoraEngineLibrarie</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\CoraEngineLibrarie\GetCell.h">
+    <ClInclude Include="$(XmakeProjectDir)\include\CoraEngineLibrarie\WeaponManager.hpp">
       <Filter>include\CoraEngineLibrarie</Filter>
     </ClInclude>
+
+
   </ItemGroup>
   <ItemGroup>
+
     <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\AngleFunctions.cpp">
       <Filter>src\CoraEngineLibrarie</Filter>
     </ClCompile>
+    <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\Astar.cpp">
+      <Filter>src\CoraEngineLibrarie</Filter>
+    </ClCompile>
     <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\ConvertMapSketch.cpp">
+      <Filter>src\CoraEngineLibrarie</Filter>
+    </ClCompile>
+    <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\Game.cpp">
+      <Filter>src\CoraEngineLibrarie</Filter>
+    </ClCompile>
+    <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\GetAdjacentCells.cpp">
+      <Filter>src\CoraEngineLibrarie</Filter>
+    </ClCompile>
+    <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\GetCell.cpp">
       <Filter>src\CoraEngineLibrarie</Filter>
     </ClCompile>
     <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\MapCollision.cpp">
@@ -108,43 +130,35 @@ xmake version 2.8.1+dev.732d60063
     <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\MapManager.cpp">
       <Filter>src\CoraEngineLibrarie</Filter>
     </ClCompile>
-    <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\Player.cpp">
+    <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\NpcManager.cpp">
       <Filter>src\CoraEngineLibrarie</Filter>
     </ClCompile>
-    <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\Prop.cpp">
+    <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\SoundManager.cpp">
+      <Filter>src\CoraEngineLibrarie</Filter>
+    </ClCompile>
+    <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\SpriteManager.cpp">
+      <Filter>src\CoraEngineLibrarie</Filter>
+    </ClCompile>
+    <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\Stripe.cpp">
       <Filter>src\CoraEngineLibrarie</Filter>
     </ClCompile>
     <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\TextureManager.cpp">
       <Filter>src\CoraEngineLibrarie</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\CoraEngineLibrarie\Animation.cpp">
+    <ClCompile Include="$(XmakeProjectDir)\src\CoraEngineLibrarie\WeaponManager.cpp">
       <Filter>src\CoraEngineLibrarie</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\CoraEngineLibrarie\Astar.cpp">
-      <Filter>src\CoraEngineLibrarie</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CoraEngineLibrarie\GetAdjacentCells.cpp">
-      <Filter>src\CoraEngineLibrarie</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CoraEngineLibrarie\GetCell.cpp">
-      <Filter>src\CoraEngineLibrarie</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CoraEngineLibrarie\SpriteManager.cpp">
-      <Filter>src\CoraEngineLibrarie</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CoraEngineLibrarie\Npc.cpp">
-      <Filter>src\CoraEngineLibrarie</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CoraEngineLibrarie\Stripe.cpp">
-      <Filter>src\CoraEngineLibrarie</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\CoraEngineLibrarie\Game.cpp">
-      <Filter>src\CoraEngineLibrarie</Filter>
-    </ClCompile>
+
+
+
   </ItemGroup>
   <ItemGroup>
+
   </ItemGroup>
   <ItemGroup>
+
+
   </ItemGroup>
-  <Import Condition="Exists('$(MSBuildThisFileDirectory)\Xmake.Custom.files.filters')" Project="$(MSBuildThisFileDirectory)\Xmake.Custom.files.filters" />
+  <Import Condition="Exists('$(MSBuildThisFileDirectory)\Xmake.Custom.files.filters')"
+    Project="$(MSBuildThisFileDirectory)\Xmake.Custom.files.filters" />
 </Project>

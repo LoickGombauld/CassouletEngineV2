@@ -4,36 +4,45 @@
 
 //Someday I'll use "Tiled Map Editor".
 //But not today.
-gbl::MAP::Map<> convert_map_sketch(sf::Image& map_sketch,std::vector<Prop>& i_Props, Player& i_player, std::vector<Npc>& i_npc, SpriteManager& i_sprite_manager)
+gbl::MAP::Map<> convert_map_sketch(sf::Image& map_sketch, entt::entity& i_playerEntity, entt::registry& registry,
+	SpriteManager& i_sprite_manager, gbl::NPC::NpcData soldier)
 {
-
+	auto& i_player = registry.get<gbl::Transform>(i_playerEntity);
 	gbl::MAP::Map<> output_map{};
-
 	for (unsigned char a = 0; a < gbl::MAP::COLUMNS; a++)
 	{
 		for (unsigned char b = 0; b < gbl::MAP::ROWS; b++)
 		{
 			sf::Color pixel = map_sketch.getPixel(a, b);
 
-			if (pixel == sf::Color::White)
+			if (pixel != sf::Color::White && pixel != sf::Color(255, 0, 0))
 			{
-				output_map[a][b] = gbl::MAP::Cell::Wall;
-			}
-			else if (pixel == sf::Color(0, 0, 255))
-			{
-				i_npc.push_back(Npc(i_sprite_manager, a, b));
-			}
-			else if (pixel == sf::Color(182, 0, 0))
-			{
-				i_Props.push_back(Prop(0, "BARREL", i_sprite_manager, a, b));
+				const auto entity = registry.create();
+				registry.emplace<gbl::Transform>(entity, sf::Vector2f( 0, 0), sf::Vector2f(a, b));
+				registry.emplace<gbl::SpriteData>(entity);
+				registry.emplace<gbl::Animation>(entity);
+				if (pixel == sf::Color(0, 0, 255))
+				{
+				auto npc = registry.emplace<gbl::NPC::NpcData>(entity);
+				npc = soldier;
+				registry.emplace<gbl::IA::Astar>(entity);
+				}
+				else if (pixel == sf::Color(182, 0, 0))
+				{
+					registry.emplace<gbl::PropData>(entity, 0, "BARREL", i_sprite_manager, a, b);
+				}
+				else if (pixel == sf::Color(255, 146, 0))
+				{
+					registry.emplace<gbl::PropData>(entity, 1, "FIRE_CAULDRON", i_sprite_manager, a, b);
+				}
 			}
 			else if (pixel == sf::Color(255, 0, 0))
 			{
-				i_player.set_position(a, b);
+				i_player.position = sf::Vector2f( a, b );
 			}
-			else if (pixel == sf::Color(255, 146, 0))
+			else if (pixel == sf::Color::White)
 			{
-				i_Props.push_back(Prop(1, "FIRE_CAULDRON", i_sprite_manager, a, b));
+				output_map[a][b] = gbl::MAP::Cell::Wall;
 			}
 			else
 			{

@@ -11,7 +11,7 @@ void TextureManager::LoadTexturesFolders(const std::string& filePath)
 			sf::Texture sfmliD;
 			sfmliD.loadFromFile(entry.path().string());
 			//Debug::Log(entry.path().filename().string() + " was added ");
-			textureIds.insert(std::pair(entry.path().filename().string(), sfmliD));
+			textureIds.insert({ entry.path().filename().string(), sfmliD });
 		}
 	}
 }

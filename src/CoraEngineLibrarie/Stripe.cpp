@@ -7,7 +7,8 @@ Stripe::Stripe() :
 	true_distance(0),
 	side(0),
 	x(0),
-	sprite_name("DEFAULT_WALL")
+	sprite_name("DEFAULT_WALL"),
+	height(0.5f)
 {
 
 }
@@ -44,7 +45,7 @@ short Stripe::get_y() const
 
 unsigned short Stripe::get_height() const
 {
-	return static_cast<unsigned short>(round(gbl::SCREEN::HEIGHT / (distance * tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_VERTICAL)))));
+	return static_cast<unsigned short>(round(gbl::SCREEN::HEIGHT / (distance * tan(deg_to_rad(height + 0.5f * gbl::RAYCASTING::FOV_VERTICAL)))));
 }
 
 unsigned short Stripe::get_side_x() const
@@ -100,4 +101,9 @@ void Stripe::set_true_distance(const float i_true_distance)
 void Stripe::set_x(const unsigned short i_x)
 {
 	x = i_x;
+}
+
+void Stripe::set_height(float newheight)
+{
+	height = newheight;
 }

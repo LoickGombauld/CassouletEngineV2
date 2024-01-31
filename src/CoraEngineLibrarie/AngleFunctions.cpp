@@ -34,3 +34,32 @@ float rad_to_deg(const float i_radians)
 {
 	return 180 * get_radians(i_radians) / gbl::RAYCASTING::PI;
 }
+
+float Distance(const sf::Vector2f& pos1, const sf::Vector2f& pos2)
+{
+	sf::Vector2f diff = pos2 - pos1;
+	return std::sqrt(diff.x * diff.x + diff.y * diff.y);
+}
+
+float DotProduct(const sf::Vector2f& vec1, const sf::Vector2f& vec2)
+{
+	return vec1.x * vec2.x + vec2.y * vec2.y;
+}
+
+float Length(const sf::Vector2f& vec)
+{
+	return std::sqrt(DotProduct(vec, vec));
+}
+sf::Vector2f Normalize(const sf::Vector2f& vec)
+{
+	return vec / Length(vec);
+}
+
+sf::Vector2f TruncateLength(const sf::Vector2f& vec, float maxLength)
+{
+	float length = Length(vec);
+	if (length > maxLength)
+		return vec / length * maxLength;
+	else
+		return vec;
+}

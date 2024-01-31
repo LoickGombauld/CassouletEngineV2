@@ -3,11 +3,12 @@
 #include <filesystem>
 #include <fstream>
 #include <unordered_map>
-#include <CoraEngineLibrarie/SpriteManager.h>
+#include <CoraEngineLibrarie/SpriteManager.hpp>
 #include <CoraEngineLibrarie/TextureManager.hpp>
+
 SpriteManager::SpriteManager()
 {
-	TextureManager::Init();
+	
 	unsigned short current_texture = 0;
 	unsigned short total_textures = 0;
 	for (const std::filesystem::directory_entry file : std::filesystem::directory_iterator("Resources\\Textures\\"))
@@ -99,7 +100,7 @@ void SpriteManager::load_texture(const unsigned short i_texture_id, const std::s
 				sprites_data[name].name = name;
 				sprites_data.at(name).image_location = "Resources/Textures/" + i_file_name + ".png";
 				sprites_data.at(name).sprite = &sprites[i_texture_id];
-				sprites_data.at(name).index = textureIndex;
+				sprites_data.at(name).frame = textureIndex;
 				textureIndex++;
 				break;
 			}

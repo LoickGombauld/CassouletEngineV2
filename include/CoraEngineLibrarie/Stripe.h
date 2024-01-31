@@ -1,7 +1,7 @@
 #pragma once
 #include <CoraEngineLibrarie/Export.hpp>
 #include <iostream>
-#include <CoraEngineLibrarie/SpriteManager.h>
+#include <CoraEngineLibrarie/SpriteManager.hpp>
 
 class CASSOULET_DLL Stripe
 {
@@ -13,6 +13,8 @@ class CASSOULET_DLL Stripe
 	float side_x;
 	//Euquackquacklidian distance.
 	float true_distance;
+
+	float height;
 
 	unsigned char side;
 
@@ -46,4 +48,5 @@ public:
 	void set_sprite_name(const std::string& i_sprite_name);
 	void set_true_distance(const float i_true_distance);
 	void set_x(const unsigned short i_x);
+	void set_height(float height);
 };
