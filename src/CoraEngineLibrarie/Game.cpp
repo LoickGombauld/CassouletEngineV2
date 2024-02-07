@@ -5,6 +5,8 @@
 #include <CoraEngineLibrarie/MapCollision.h>
 #include <CoraEngineLibrarie/Astar.h>
 
+entt::entity CreatePlayer(entt::registry& registry, sf::Vector2f& position);
+void fill_map(gbl::MAP::Map<>& map, entt::registry& registry, entt::entity& entity);
 //declare static fields
 Game* Game::i;
 
@@ -22,15 +24,15 @@ Game::Game(entt::registry& registry) :
 	npc_manager(sprite_manager)
 {
 	i = this;
-	playerEntity = CreatePlayer(registry, sf::Vector2f (0, 0 ));
+	playerEntity = CreatePlayer(registry, sf::Vector2f(0, 0));
 	window.setMouseCursorVisible(0);
 	window.setView(sf::View(sf::FloatRect(0, 0, gbl::SCREEN::WIDTH, gbl::SCREEN::HEIGHT)));
 	window.setFramerateLimit(gbl::SCREEN::FPSMax);
 	map = convert_map_sketch(*managerMap.GetLevel(0), playerEntity, registry, sprite_manager,
 		Game::I()->GetNpcData()->get_Npc_data("SOLDIER"));
-	auto view = registry.view<gbl::NPC::NpcData>();
+	auto& view = registry.view<gbl::NPC::NpcData>();
 	for (auto entity : view) {
-		fill_map(map,registry,entity);
+		fill_map(map, registry, entity);
 	}
 	for (Stripe& stripe : stripes)
 	{
@@ -38,25 +40,30 @@ Game::Game(entt::registry& registry) :
 	}
 }
 
-
 entt::entity CreatePlayer(entt::registry& registry, sf::Vector2f& position) {
 	entt::entity entity = registry.create();
 	registry.emplace<gbl::Transform>(entity);
+	auto& playerCollider = registry.emplace<gbl::Collider>(entity);
 	registry.emplace<gbl::PLAYER::PlayerData>(entity);
-	auto playerdata = registry.get<gbl::PLAYER::PlayerData>(entity);
 	registry.emplace<gbl::Animation>(entity);
-	auto playerAnimation = registry.get<gbl::Animation>(entity);
-	registry.emplace <gbl::WEAPON::WeaponData> (entity);
-	auto weapon = registry.get <gbl::WEAPON::WeaponData > (entity);
+	registry.emplace <gbl::WEAPON::WeaponData>(entity, Game::I()->weapon_manager.get_weapon_data("WEAPON_2"));
+	registry.emplace<gbl::SpriteData>(entity, Game::I()->sprite_manager.get_sprite_data("WEAPON_2"));
+	auto& playerAnimation = registry.get<gbl::Animation>(entity);
+	auto& playerSpriteData = registry.get<gbl::SpriteData>(entity);
+	playerCollider.istrigger = true;
+	playerCollider.range = 1;
 	playerAnimation.animation_speed = gbl::SPRITES::FIRE_ANIMATION_SPEED;
 	playerAnimation.ping_pong = 0;
-	weapon.name = "WEAPON_2";
-	weapon = Game::I()->weapon_manager.get_weapon_data(weapon.name);
+	playerSpriteData.total_frames = playerSpriteData.total_frames;
+
+	playerAnimation.animation_speed = std::fmod(playerAnimation.animation_speed, playerSpriteData.total_frames);
+	playerSpriteData.frame = fmod(playerSpriteData.total_frames + fmod(playerSpriteData.frame, playerSpriteData.total_frames), playerSpriteData.total_frames);
+
 
 	return entity;
 }
 
-int  Game::get_width(SpriteManager& sprite_manager,float distance,std::string name) const
+int  Game::get_width(SpriteManager& sprite_manager, float distance, std::string name) const
 {
 	float sprite_height = sprite_manager.get_sprite_data(name).texture_box.height;
 	float sprite_width = sprite_manager.get_sprite_data(name).texture_box.width;
@@ -64,9 +71,20 @@ int  Game::get_width(SpriteManager& sprite_manager,float distance,std::string na
 	return round(gbl::SCREEN::HEIGHT * sprite_width / (distance * sprite_height * tan(deg_to_rad(0.5f * gbl::RAYCASTING::FOV_HORIZONTAL))));
 }
 
-void Game::DrawAnimation(const sf::Vector2<short>& i_position, sf::RenderWindow& i_window, gbl::SpriteData& sprite_data, gbl::Animation& animation, const bool i_mirror_horizontal, const bool i_mirror_vertical, const float i_scale_x, const float i_scale_y, const sf::Color& i_color, const sf::Rect<unsigned short>& i_texture_box)const
+int Game::get_x( float distance, std::string name,gbl::NPC::NpcData& npcData) 
 {
-	unsigned short frame = floor(animation.current_frame);
+	return npcData.screen_x - round(0.5f * get_width(sprite_manager, npcData.distance, npcData.name));
+}
+
+int Game::get_y(gbl::NPC::NpcData& npcData)
+{
+	return round(0.5f * (gbl::SCREEN::HEIGHT - npcData.get_height()));
+}
+
+
+void Game::DrawAnimation(const sf::Vector2<short>& i_position, sf::RenderWindow& i_window, gbl::SpriteData& sprite_data, gbl::Animation& animation, const bool i_mirror_horizontal, const bool i_mirror_vertical, const float i_scale_x, const float i_scale_y, const sf::Color& i_color, const sf::Rect<unsigned short>& i_texture_box)
+{
+	unsigned short frame = floor(sprite_data.frame);
 
 	//We're treating the ping pong animation as a regular one with twice as many frames to make things easier.
 	if (1 == animation.ping_pong && frame >= sprite_data.total_frames)
@@ -74,13 +92,18 @@ void Game::DrawAnimation(const sf::Vector2<short>& i_position, sf::RenderWindow&
 		frame -= 2 * (1 + frame - sprite_data.total_frames);
 	}
 
-	Game::I()->sprite_manager.draw_sprite(frame, sprite_data.name, i_position, i_window, i_mirror_horizontal, i_mirror_vertical, i_scale_x, i_scale_y, i_color, i_texture_box);
+	sprite_manager.draw_sprite(frame, sprite_data.name, i_position, i_window, i_mirror_horizontal, i_mirror_vertical, i_scale_x, i_scale_y, i_color, i_texture_box);
 }
 
 
+void PlayerTakeDamage()
+{
+	std::cout << "TakeDamage" << std::endl;
+}
+
 void fill_map(gbl::MAP::Map<>& map, entt::registry& registry, entt::entity& entity)
 {
-	auto npcAstar = registry.get<gbl::IA::Astar>(entity);
+	auto& npcAstar = registry.get<gbl::IA::Astar>(entity);
 	for (unsigned short a = 0; a < gbl::MAP::COLUMNS; a++)
 	{
 		for (unsigned short b = 0; b < gbl::MAP::ROWS; b++)
@@ -98,13 +121,15 @@ void fill_map(gbl::MAP::Map<>& map, entt::registry& registry, entt::entity& enti
 }
 
 void UpdateNpc(Game* game, entt::registry& registry, entt::entity& npc) {
-	auto player = game->playerEntity;
-	auto playerPosition = registry.get<gbl::Transform>(player).position;
-	auto playerdirection = registry.get<gbl::Transform>(player).direction;
-	auto npcdata = registry.get<gbl::NPC::NpcData>(npc);
-	auto npcSprite = registry.get<gbl::SpriteData>(npc);
-	auto npcAstar = registry.get<gbl::IA::Astar>(npc);
-	auto npcTransform = registry.get<gbl::Transform>(npc);
+	auto& player = game->playerEntity;
+	auto& playerPosition = registry.get<gbl::Transform>(player).position;
+	auto& playerdirection = registry.get<gbl::Transform>(player).direction;
+	auto& playerCollider = registry.get<gbl::Collider>(player);
+	auto& npcdata = registry.get<gbl::NPC::NpcData>(npc);
+	auto& npcSprite = registry.get<gbl::SpriteData>(npc);
+	auto& npcAstar = registry.get<gbl::IA::Astar>(npc);
+	auto& npcTransform = registry.get<gbl::Transform>(npc);
+	auto& npcCollider = registry.get<gbl::Collider>(npc);
 	if (1 == game->window.hasFocus())
 	{
 		float angle = get_radians(atan2(playerPosition.y - npcTransform.position.y, npcTransform.position.x - playerPosition.x));
@@ -160,13 +185,12 @@ void UpdateNpc(Game* game, entt::registry& registry, entt::entity& npc) {
 			break;
 		}
 
-
 		// si Npc rentre en contact avec le joueur
-		if (1 > sqrt(pow(npcTransform.position.x - playerPosition.x, 2) + pow(npcTransform.position.y - playerPosition.y, 2)))
+		if (npcCollider.OnCollision(playerPosition,playerCollider,npcTransform))
 		{
+			PlayerTakeDamage();
 		}
-
-		//Steven moves to the next cell in the A star path.
+		//Npc moves to the next cell in the A star path.
 		if (npcAstar.next_cell.x < npcTransform.position.x)
 		{
 			step_x = std::max(-speed, npcAstar.next_cell.x - npcTransform.position.x);
@@ -227,19 +251,19 @@ void UpdateNpc(Game* game, entt::registry& registry, entt::entity& npc) {
 }
 
 void UpdateProp(Game* game, entt::registry& registry, entt::entity& npc) {
-	auto player = game->playerEntity;
-	auto playerPosition = registry.get<gbl::Transform>(player).position;
-	auto playerdirection = registry.get<gbl::Transform>(player).direction;
-	auto playerdata = registry.get<gbl::NPC::NpcData>(player);
-	auto playerSprite = registry.get<gbl::SpriteData>(player);
-	auto npcTransform = registry.get<gbl::Transform>(npc);
+	auto& player = game->playerEntity;
+	auto& playerPosition = registry.get<gbl::Transform>(player).position;
+	auto& playerdirection = registry.get<gbl::Transform>(player).direction;
+	auto& playerdata = registry.get<gbl::NPC::NpcData>(player);
+	auto& playerSprite = registry.get<gbl::SpriteData>(player);
+	auto& npcTransform = registry.get<gbl::Transform>(npc);
 }
 
 void UpdatePlayer(float deltaTime, Game* game, entt::registry& registry) {
 
-	auto playerdata = registry.get<gbl::PLAYER::PlayerData>(game->playerEntity);
-	auto direction = registry.get<gbl::Transform>(game->playerEntity).direction;
-	auto position = registry.get<gbl::Transform>(game->playerEntity).position;
+	auto& playerdata = registry.get<gbl::PLAYER::PlayerData>(game->playerEntity);
+	auto& direction = registry.get<gbl::Transform>(game->playerEntity).direction;
+	auto& position = registry.get<gbl::Transform>(game->playerEntity).position;
 	if (1 == game->window.hasFocus())
 	{
 		float rotation_horizontal = 0;
@@ -261,7 +285,7 @@ void UpdatePlayer(float deltaTime, Game* game, entt::registry& registry) {
 
 		if (hasMove)
 		{
-			playerdata.speed += deltaTime / 2;
+			playerdata.speed += deltaTime;
 		}
 		else
 		{
@@ -294,6 +318,7 @@ void UpdatePlayer(float deltaTime, Game* game, entt::registry& registry) {
 		{
 			playerdata.velocity.x *= 0.90f - playerdata.friction;
 			playerdata.velocity.y *= 0.90f - playerdata.friction;
+			playerdata.speed *= 0.90f - playerdata.friction;
 			step_x = playerdata.velocity.x;
 			step_y = playerdata.velocity.y;
 		}
@@ -323,46 +348,44 @@ void UpdatePlayer(float deltaTime, Game* game, entt::registry& registry) {
 		}
 		playerdata.lastfire += deltaTime;
 
-		auto weapon = registry.get < gbl::WEAPON::WeaponData > (game->playerEntity);
+		auto& weapon = registry.get < gbl::WEAPON::WeaponData >(game->playerEntity);
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && playerdata.lastfire > weapon.fireDelay)
 		{
 			weapon.fireSound.play();
 			playerdata.lastfire = 0;
 			std::cout << "fire !" << std::endl;
 		}
-		/*UpdateCollider(std::function<void(Entity&)>(PlayerTakeDamage), game, "Enemy");
-		UpdateCollider(std::function<void(Entity&)>(PlayerTakeDamage), game, "Projectile_Enemy");*/
 	}
 }
 
 void DrawNpc(entt::registry& registry, entt::entity& npc, Game* game, const short i_pitch, sf::RenderWindow& i_window) {
-	auto npcData = registry.get<gbl::NPC::NpcData>(npc);
-	auto npcTransform = registry.get<gbl::Transform>(npc);
-	auto npcSpriteData = registry.get<gbl::SpriteData>(npc);
+	auto& npcData = registry.get<gbl::NPC::NpcData>(npc);
+
+	auto& npcSpriteData = registry.get<gbl::SpriteData>(npc);
 	float sprite_height = game->sprite_manager.get_sprite_data(npcData.name).texture_box.height;
 	float sprite_width = game->sprite_manager.get_sprite_data(npcData.name).texture_box.width;
 
 	unsigned char shade = 255 * std::clamp<float>(1 - npcData.distance / gbl::RAYCASTING::RENDER_DISTANCE, 0, 1);
 
-	npcData.in_the_view &= gbl::SCREEN::HEIGHT > i_pitch + npcTransform.position.y &&
-		gbl::SCREEN::WIDTH > npcTransform.position.x && npcTransform.position.x > -1 * Game::I()->get_width(game->sprite_manager, npcData.distance, npcData.name) 
-		&& i_pitch + npcTransform.position.y > -1 * npcData.get_height();
+	npcData.in_the_view &= gbl::SCREEN::HEIGHT > i_pitch + game->get_y(npcData) &&
+		gbl::SCREEN::WIDTH > game->get_x(npcData.distance,npcData.name,npcData) && game->get_x(npcData.distance, npcData.name, npcData) > -1 * game->get_width(game->sprite_manager, npcData.distance, npcData.name)
+		&& i_pitch + game->get_y(npcData) > -1 * npcData.get_height();
 
 	if (0 < shade && 1 == npcData.in_the_view)
 	{
-		game->sprite_manager.draw_sprite(npcSpriteData.frame, npcData.name, 
-			sf::Vector2<short>(npcTransform.position.x, i_pitch + npcTransform.position.y), 
-			i_window, 0, 0, Game::I()->get_width(game->sprite_manager, npcData.distance, npcData.name) / sprite_width,
+		game->sprite_manager.draw_sprite(npcSpriteData.frame, npcData.name,
+			sf::Vector2<short>(game->get_x(npcData.distance, npcData.name, npcData), i_pitch + game->get_y(npcData)),
+			i_window, 0, 0, game->get_width(game->sprite_manager, npcData.distance, npcData.name) / sprite_width,
 			npcData.get_height() / sprite_height, sf::Color(shade, shade, shade));
 	}
 }
 
-void DrawProp(entt::registry& registry, entt::entity& prop, Game* game, const short i_pitch, sf::RenderWindow& i_window) 
+void DrawProp(entt::registry& registry, entt::entity& prop, Game* game, const short i_pitch, sf::RenderWindow& i_window)
 {
-	auto propData = registry.get<gbl::PropData>(prop);
-	auto propTransform = registry.get<gbl::Transform>(prop);
-	auto propSpriteData = registry.get<gbl::SpriteData>(prop);
-	auto propAnimation = registry.get<gbl::Animation>(prop);
+	auto& propData = registry.get<gbl::PropData>(prop);
+	auto& propTransform = registry.get<gbl::Transform>(prop);
+	auto& propSpriteData = registry.get<gbl::SpriteData>(prop);
+	auto& propAnimation = registry.get<gbl::Animation>(prop);
 	float sprite_height = game->sprite_manager.get_sprite_data(propData.name).texture_box.height;
 	float sprite_width = game->sprite_manager.get_sprite_data(propData.name).texture_box.width;
 
@@ -376,12 +399,12 @@ void DrawProp(entt::registry& registry, entt::entity& prop, Game* game, const sh
 		{
 			game->sprite_manager.draw_sprite(0, propData.name, sf::Vector2<short>(propTransform.position.x,
 				i_pitch + propTransform.position.y), i_window, 0, 0, Game::I()->get_width(game->sprite_manager,
-					propData.distance, propData.name) / sprite_width, propData.get_height() / sprite_height, 
+					propData.distance, propData.name) / sprite_width, propData.get_height() / sprite_height,
 				sf::Color(shade, shade, shade));
 		}
 		else
 		{
-			game->DrawAnimation(sf::Vector2<short>(propTransform.position.x, i_pitch + propTransform.position.y),i_window,propSpriteData, propAnimation, 0, 0, Game::I()->get_width(game->sprite_manager, propData.distance,propData.name) / sprite_width, propData.get_height() / sprite_height,
+			game->DrawAnimation(sf::Vector2<short>(propTransform.position.x, i_pitch + propTransform.position.y), i_window, propSpriteData, propAnimation, 0, 0, Game::I()->get_width(game->sprite_manager, propData.distance, propData.name) / sprite_width, propData.get_height() / sprite_height,
 				sf::Color(shade, shade, shade));
 		}
 	}
@@ -400,7 +423,7 @@ bool Game::is_open() const
 
 void Game::calculate_fov_visualization(entt::registry& registry)
 {
-	auto player = registry.get<gbl::Transform>(playerEntity);
+	auto& player = registry.get<gbl::Transform>(playerEntity);
 	float start_x = 0.5f + player.position.x;
 	float start_y = 0.5f + player.position.y;
 
@@ -415,9 +438,9 @@ void Game::calculate_fov_visualization(entt::registry& registry)
 void Game::Render(entt::registry& registry)
 {
 	std::vector<bool> npc_is_drawn;
-	auto viewNpc = registry.view<gbl::NPC::NpcData>();
-	auto viewProp = registry.view<gbl::PropData>();
-	auto player = registry.get<gbl::Transform>(playerEntity);
+	auto& viewNpc = registry.view<gbl::NPC::NpcData>();
+	auto& viewProp = registry.view<gbl::PropData>();
+	auto& player = registry.get<gbl::Transform>(playerEntity);
 	for (auto id : viewNpc) {
 		npc_is_drawn.push_back(0);
 	}
@@ -521,6 +544,7 @@ void Game::Render(entt::registry& registry)
 	//Drawing things layer by layer.
 	for (Stripe& stripe : stripes)
 	{
+				int index = 0;
 		for (auto propEntity : viewProp)
 		{
 			auto& currentProp = viewProp.get<gbl::PropData>(propEntity);
@@ -531,8 +555,8 @@ void Game::Render(entt::registry& registry)
 				//I had 2 options:
 				//1) Spending hours trying to figure out the efficient way of doing this.
 				//2) Writing the same code 3 times and tolerating people making fun of me.
-				int index = 0;
-				for (auto npcEntity : viewNpc) {
+				for (auto
+ npcEntity : viewNpc) {
 
 					if (0 == npc_is_drawn[index])
 					{
@@ -543,12 +567,12 @@ void Game::Render(entt::registry& registry)
 					index++;
 				}
 
-				DrawProp(registry, propEntity,this,pitch, window);
+				DrawProp(registry, propEntity, this, pitch, window);
 
 			}
 		}
-		int index = 0;
-		for (auto npcEntity : viewNpc) {
+		for (auto npcEntity : viewNpc)
+		{
 			auto& npcdata = registry.get<gbl::NPC::NpcData>(npcEntity);
 			if (0 == npc_is_drawn[index])
 			{
@@ -559,10 +583,10 @@ void Game::Render(entt::registry& registry)
 					DrawNpc(registry, npcEntity, this, pitch, window);
 				}
 			}
-			stripe.set_height(hand_offset);
-			stripe.draw(pitch, window);
 			index++;
 		}
+			stripe.set_height(hand_offset);
+			stripe.draw(pitch, window);
 	}
 
 	for (auto propEntity : viewProp)
@@ -583,7 +607,7 @@ void Game::Render(entt::registry& registry)
 			index++;
 		}
 
-		DrawProp(registry,propEntity,this,pitch, window);
+		DrawProp(registry, propEntity, this, pitch, window);
 	}
 	int index = 0;
 	for (auto npcEntity : viewNpc) {
@@ -601,8 +625,8 @@ void Game::Render(entt::registry& registry)
 	}
 
 	DrawAnimation(sf::Vector2<short>((gbl::SCREEN::WIDTH + hand_offset_x - hand_texture_width) / 2, (gbl::SCREEN::HEIGHT + hand_offset_y - hand_texture_height) * 2.75f),
-		window,registry.get<gbl::SpriteData>( playerEntity) , 
-		hand_animation,0, 0, gbl::SPRITES::HAND_SCALE,
+		window, registry.get<gbl::SpriteData>(playerEntity),
+		hand_animation, 0, 0, gbl::SPRITES::HAND_SCALE,
 		gbl::SPRITES::HAND_SCALE);
 
 	window.display();
@@ -626,10 +650,10 @@ void Game::Render(entt::registry& registry)
 
 void Game::draw_map(entt::registry& registry)
 {
-	auto player = registry.get<gbl::Transform>(playerEntity);
+	auto& player = registry.get<gbl::Transform>(playerEntity);
 	float frame_angle = 360.f / sprite_manager.get_sprite_data("MAP_PLAYER").total_frames;
 	float shifted_direction = get_degrees(player.direction.x + 0.5f * frame_angle);
-	auto viewNpc = registry.view<gbl::NPC::NpcData>();
+	auto& viewNpc = registry.view<gbl::NPC::NpcData>();
 	for (unsigned short a = 0; a < gbl::MAP::COLUMNS; a++)
 	{
 		for (unsigned short b = 0; b < gbl::MAP::ROWS; b++)
@@ -690,7 +714,7 @@ void Game::handle_events()
 
 void Game::GameRaycast(entt::registry& registry)
 {
-	auto player = registry.get<gbl::Transform>(playerEntity);
+	auto& player = registry.get<gbl::Transform>(playerEntity);
 	float ray_start_x = 0.5f + player.position.x;
 	float ray_start_y = 0.5f + player.position.y;
 
@@ -898,9 +922,9 @@ void Game::set_title(const std::string& i_title)
 
 void Game::Update(float deltaTime, entt::registry& registry)
 {
-	auto player = registry.get<gbl::Transform>(playerEntity);
-	auto viewNpc = registry.view<gbl::NPC::NpcData>();
-	auto viewProp = registry.view<gbl::PropData>();
+	auto & player = registry.get<gbl::Transform>(playerEntity);
+	auto & viewNpc = registry.view<gbl::NPC::NpcData>();
+	auto & viewProp = registry.view<gbl::PropData>();
 
 	float player_movement_distance;
 
@@ -917,10 +941,10 @@ void Game::Update(float deltaTime, entt::registry& registry)
 	for (auto propEntity : viewProp)
 	{
 		auto& currentProp = viewProp.get<gbl::PropData>(propEntity);
-		UpdateProp(this,registry, propEntity);
+		UpdateProp(this, registry, propEntity);
 	}
 
-	hand_animation.Update(registry.get<gbl::SpriteData>(playerEntity));
+	hand_animation.Update(registry.get<gbl::SpriteData>(playerEntity), registry.get<gbl::SpriteData>(playerEntity).frame);
 
 	//So this is what they mean when they say "Drawing hands is hard".
 	if (0 < player_movement_distance)

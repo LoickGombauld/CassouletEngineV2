@@ -18,27 +18,33 @@ gbl::MAP::Map<> convert_map_sketch(sf::Image& map_sketch, entt::entity& i_player
 			if (pixel != sf::Color::White && pixel != sf::Color(255, 0, 0))
 			{
 				const auto entity = registry.create();
-				registry.emplace<gbl::Transform>(entity, sf::Vector2f(0, 0), sf::Vector2f(a, b));
-				registry.emplace<gbl::SpriteData>(entity);
+				registry.emplace<gbl::Transform>(entity, sf::Vector2f(0, 0), sf::Vector2f(a, b), "Props");
+				auto& collider = registry.emplace<gbl::Collider>(entity);
 				registry.emplace<gbl::Animation>(entity);
+					collider.range = 1;
 				if (pixel == sf::Color(0, 0, 255))
 				{
-					registry.emplace<gbl::NPC::NpcData>(entity,soldier);
+					collider.istrigger = true;
+					registry.get<gbl::Transform>(entity).tag = "Enemy";
+					registry.emplace<gbl::NPC::NpcData>(entity, soldier);
 					registry.emplace<gbl::IA::Astar>(entity);
+					registry.emplace<gbl::SpriteData>(entity, i_sprite_manager.get_sprite_data(soldier.name));
 				}
 				else if (pixel == sf::Color(182, 0, 0))
 				{
 					registry.emplace<gbl::PropData>(entity);
-					auto prop = registry.get<gbl::PropData>(entity);
+					auto& prop = registry.get<gbl::PropData>(entity);
 					prop.is_animation = 0;
 					prop.name = "BARREL";
+					registry.emplace<gbl::SpriteData>(entity, i_sprite_manager.get_sprite_data(prop.name));
 				}
 				else if (pixel == sf::Color(255, 146, 0))
 				{
 					registry.emplace<gbl::PropData>(entity);
-					auto prop = registry.get<gbl::PropData>(entity);
+					auto& prop = registry.get<gbl::PropData>(entity);
 					prop.is_animation = 1;
 					prop.name = "FIRE_CAULDRON";
+					registry.emplace<gbl::SpriteData>(entity, i_sprite_manager.get_sprite_data(prop.name));
 				}
 			}
 			else if (pixel == sf::Color(255, 0, 0))

@@ -28,10 +28,9 @@ namespace gbl
 		bool ping_pong;
 
 		float animation_speed;
-		float current_frame;
+	
 
-		unsigned short total_frames;
-		bool Animation::Update(const SpriteData& sprite_data, const char i_animation_end = 0)
+		bool Animation::Update(const SpriteData& sprite_data, int current_frame,const char i_animation_end = 0)
 		{
 			//We're gonna return whether or not the animation ended.
 			//If the animation is going backwards and it reached the first frame, the left_end will be 1.
@@ -42,12 +41,12 @@ namespace gbl
 			if (0 == ping_pong)
 			{
 				left_end = 0 > animation_speed + current_frame;
-				right_end = total_frames <= animation_speed + current_frame;
+				right_end = sprite_data.total_frames <= animation_speed + current_frame;
 			}
 			else
 			{
 				//You have NO IDEA how long it took me to figure this out.
-				left_end = 0 > animation_speed + current_frame || total_frames <= animation_speed + current_frame;
+				left_end = 0 > animation_speed + current_frame || sprite_data.total_frames <= animation_speed + current_frame;
 				right_end = current_frame < sprite_data.total_frames&& sprite_data.total_frames <= animation_speed + current_frame;
 
 				if (0 == right_end)
@@ -56,7 +55,7 @@ namespace gbl
 				}
 			}
 
-			current_frame = std::fmod(animation_speed + current_frame + total_frames, total_frames);
+			current_frame = std::fmod(animation_speed + current_frame + sprite_data.total_frames, sprite_data.total_frames);
 
 			switch (i_animation_end)
 			{
@@ -87,6 +86,15 @@ namespace gbl
 	struct Transform {
 		sf::Vector2f direction;
 		sf::Vector2f position;
+		std::string  tag;
+	};
+
+	struct Collider {
+		float range;
+		bool istrigger = true;
+		bool OnCollision(sf::Vector2f& targetPosition, Collider& tragetCollider,Transform& entityPosition) {
+			return (range > sqrt(pow(targetPosition.x - entityPosition.position.x, tragetCollider.range) + pow(targetPosition.y - entityPosition.position.y, tragetCollider.range)));		
+		}
 	};
 
 	namespace WEAPON {
@@ -139,7 +147,7 @@ namespace gbl
 			float friction = 0.0121f;
 			sf::Vector2f velocity;
 			float lastfire;
-			float speedMax = 10;
+			float speedMax = 0.1f;
 			int credit = 0;
 			int bombs = 0;
 			int keys = 0;
