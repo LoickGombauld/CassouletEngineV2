@@ -1,5 +1,3 @@
-#include <imgui-SFML.h>
-#include <imgui.h>
 #include <iostream>
 #include <CoraEngineLibrarie/Window.hpp>
 #include <CoraEngineLibrarie/Global.hpp>
@@ -16,7 +14,7 @@ int main()
 	mapWindow.GetHandle()->setPosition({ mapWindow.GetHandle()->getPosition() / 6 });
 	mapWindow.SetFrameRate(144);
 	mapWindow.SetVerticalSyncEnable(true);
-	Window window(WIDTHSCREEN, HEIGHTSCREEN, "Cora Engine (Ou Cassoulet Engine 2 why not)");
+	Window window(WIDTHSCREEN, HEIGHTSCREEN, "Cora Engine !");
 	window.SetFrameRate(144);
 	window.SetVerticalSyncEnable(true);
 	window.SetMouseCursorVisible(false);
